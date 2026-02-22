@@ -1,0 +1,5 @@
+{
+  "name": "Knave Character Builder",
+  "description": "An electronic character sheet generator for the Knave OSR RPG system. Features auto-rolling, inventory management, and print-friendly export.",
+  "requestFramePermissions": []
+}
