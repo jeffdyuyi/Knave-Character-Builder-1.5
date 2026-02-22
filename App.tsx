@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { 
   Character, 
   StatName, 
@@ -53,9 +53,30 @@ const generateInitialCharacter = (): Character => {
   };
 };
 
+const LOCAL_STORAGE_KEY = 'knave_character_data';
+
 const App: React.FC = () => {
-  const [character, setCharacter] = useState<Character>(generateInitialCharacter());
+  const [character, setCharacter] = useState<Character>(() => {
+    try {
+      const saved = localStorage.getItem(LOCAL_STORAGE_KEY);
+      if (saved) {
+        return JSON.parse(saved);
+      }
+    } catch (e) {
+      console.error("Failed to load character from storage", e);
+    }
+    return generateInitialCharacter();
+  });
   const [viewMode, setViewMode] = useState<'edit' | 'sheet' | 'rules' | 'tables'>('edit');
+
+  // Persistence
+  useEffect(() => {
+    try {
+      localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(character));
+    } catch (e) {
+      console.error("Failed to save character to storage", e);
+    }
+  }, [character]);
 
   // Actions
   const rerollStats = useCallback(() => {
@@ -151,39 +172,42 @@ const App: React.FC = () => {
     }));
   }, []);
 
-  const addItem = (item: Item) => {
+  const addItem = useCallback((item: Item) => {
     setCharacter(prev => ({ ...prev, inventory: [...prev.inventory, item] }));
-  };
+  }, []);
 
-  const removeItem = (id: string) => {
+  const removeItem = useCallback((id: string) => {
     setCharacter(prev => ({ ...prev, inventory: prev.inventory.filter(i => i.id !== id) }));
-  };
+  }, []);
 
-  const updateItem = (id: string, updates: Partial<Item>) => {
+  const updateItem = useCallback((id: string, updates: Partial<Item>) => {
     setCharacter(prev => ({
       ...prev,
       inventory: prev.inventory.map(item => item.id === id ? { ...item, ...updates } : item)
     }));
-  };
+  }, []);
 
-  const handleXpChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const xp = Math.max(0, parseInt(e.target.value) || 0);
+  const handleXpChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const val = e.target.value;
+    const xp = val === '' ? 0 : Math.max(0, parseInt(val) || 0);
     // Knave rules: usually 1000 XP per level.
     const level = Math.floor(xp / 1000) + 1;
     setCharacter(prev => ({ ...prev, xp, level }));
-  };
+  }, []);
 
-  const handleLevelChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const level = Math.max(1, parseInt(e.target.value) || 1);
+  const handleLevelChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const val = e.target.value;
+    const level = val === '' ? 1 : Math.max(1, parseInt(val) || 1);
     // Sync XP to minimum for that level
     const xp = (level - 1) * 1000;
     setCharacter(prev => ({ ...prev, level, xp }));
-  };
+  }, []);
 
-  const handleMaxHpChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const max = Math.max(1, parseInt(e.target.value) || 1);
-    setCharacter(prev => ({ ...prev, hp: { ...prev.hp, max, current: max } }));
-  };
+  const handleMaxHpChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const val = e.target.value;
+    const max = val === '' ? 1 : Math.max(1, parseInt(val) || 1);
+    setCharacter(prev => ({ ...prev, hp: { ...prev.hp, max, current: prev.hp.current > max ? max : prev.hp.current } }));
+  }, []);
 
   if (viewMode === 'sheet') {
     return <CharacterSheet character={character} onEdit={() => setViewMode('edit')} />;
