@@ -1,6 +1,7 @@
 import React from 'react';
 import { Item } from '../types';
-import { Trash2, Plus, Backpack, Shield, Sword, Hammer } from 'lucide-react';
+import { Trash2, Plus, Backpack, Shield, Sword, Hammer, List, Edit3 } from 'lucide-react';
+import { ITEM_PRICES } from '../constants';
 
 interface InventoryBlockProps {
   inventory: Item[];
@@ -19,7 +20,9 @@ const InventoryBlock: React.FC<InventoryBlockProps> = ({
   onUpdateItem,
   onAutoGenerate
 }) => {
+  const [addMode, setAddMode] = React.useState<'preset' | 'custom'>('preset');
   const [newItemName, setNewItemName] = React.useState('');
+  const [selectedPreset, setSelectedPreset] = React.useState('');
 
   const totalSlotsUsed = inventory.reduce((sum, item) => sum + item.slots, 0);
   const isOverencumbered = totalSlotsUsed > maxSlots;
@@ -38,7 +41,7 @@ const InventoryBlock: React.FC<InventoryBlockProps> = ({
 
   const totalDefense = baseAC + bonusAC;
 
-  const handleAdd = (e: React.FormEvent) => {
+  const handleAddCustom = (e: React.FormEvent) => {
     e.preventDefault();
     if (!newItemName.trim()) return;
     onAddItem({
@@ -49,6 +52,63 @@ const InventoryBlock: React.FC<InventoryBlockProps> = ({
       quality: 3
     });
     setNewItemName('');
+  };
+
+  const handleAddPreset = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!selectedPreset) return;
+
+    // Find the item
+    let foundItem = null;
+    let category = '';
+    for (const [cat, items] of Object.entries(ITEM_PRICES)) {
+      const it = items.find(i => i.name === selectedPreset);
+      if (it) {
+        foundItem = it;
+        category = cat;
+        break;
+      }
+    }
+
+    if (!foundItem) return;
+
+    let parsedName = foundItem.name.split(' (')[0];
+    let type: 'gear' | 'armor' | 'weapon' = 'gear';
+    let defense: number | undefined = undefined;
+    let damage: string | undefined = undefined;
+    let slots = 1;
+    let quality = 3;
+
+    if (category === '护甲') {
+      type = 'armor';
+      const defMatch1 = foundItem.name.match(/防御\+(\d+)/);
+      const defMatch2 = foundItem.name.match(/防御(\d+)/);
+      if (defMatch1) defense = parseInt(defMatch1[1]);
+      else if (defMatch2) defense = parseInt(defMatch2[1]);
+    } else if (category === '武器') {
+      type = 'weapon';
+      const dmgMatch = foundItem.name.match(/(d\d+)伤害/);
+      if (dmgMatch) damage = dmgMatch[1];
+    }
+
+    const slotMatch = foundItem.name.match(/(\d+)栏位/);
+    if (slotMatch) slots = parseInt(slotMatch[1]);
+
+    const qualMatch = foundItem.name.match(/(\d+)耐久/);
+    if (qualMatch) quality = parseInt(qualMatch[1]);
+
+    onAddItem({
+      id: Math.random().toString(36).substr(2, 9),
+      name: parsedName,
+      slots: slots,
+      type: type,
+      quality: quality,
+      defense: defense,
+      damage: damage
+    });
+
+    // reset selection so user can add again or add another
+    setSelectedPreset('');
   };
 
   return (
@@ -191,18 +251,59 @@ const InventoryBlock: React.FC<InventoryBlockProps> = ({
         )}
       </div>
 
-      <form onSubmit={handleAdd} className="flex gap-2">
-        <input
-          type="text"
-          value={newItemName}
-          onChange={(e) => setNewItemName(e.target.value)}
-          placeholder="添加物品..."
-          className="flex-grow border border-stone-300 rounded px-2 py-1 text-sm focus:outline-none focus:border-stone-500"
-        />
-        <button type="submit" className="bg-stone-800 text-white px-3 py-1 rounded hover:bg-stone-700">
-          <Plus size={16} />
+      {/* Add Mode Toggle */}
+      <div className="flex mb-2 gap-1 border-b border-stone-200">
+        <button
+          onClick={() => setAddMode('preset')}
+          className={`flex-1 py-1 text-sm font-bold flex items-center justify-center gap-1 transition-colors ${addMode === 'preset' ? 'text-amber-700 border-b-2 border-amber-700' : 'text-stone-400 hover:bg-stone-50'}`}
+        >
+          <List size={14} /> 列表添加
         </button>
-      </form>
+        <button
+          onClick={() => setAddMode('custom')}
+          className={`flex-1 py-1 text-sm font-bold flex items-center justify-center gap-1 transition-colors ${addMode === 'custom' ? 'text-amber-700 border-b-2 border-amber-700' : 'text-stone-400 hover:bg-stone-50'}`}
+        >
+          <Edit3 size={14} /> 自定义添加
+        </button>
+      </div>
+
+      {/* Add Item Form */}
+      {addMode === 'preset' ? (
+        <form onSubmit={handleAddPreset} className="flex gap-2">
+          <select
+            value={selectedPreset}
+            onChange={(e) => setSelectedPreset(e.target.value)}
+            className="flex-grow border border-stone-300 rounded px-2 py-1 text-sm focus:outline-none focus:border-stone-500 font-serif"
+          >
+            <option value="" disabled>-- 选择物品 --</option>
+            {Object.entries(ITEM_PRICES).map(([category, items]) => (
+              <optgroup key={category} label={category}>
+                {items.map(item => (
+                  <option key={item.name} value={item.name}>
+                    {item.name} ({item.cost}c)
+                  </option>
+                ))}
+              </optgroup>
+            ))}
+          </select>
+          <button type="submit" disabled={!selectedPreset} className="bg-stone-800 text-white px-3 py-1 rounded hover:bg-stone-700 disabled:opacity-50 disabled:cursor-not-allowed">
+            <Plus size={16} />
+          </button>
+        </form>
+      ) : (
+        <form onSubmit={handleAddCustom} className="flex gap-2">
+          <input
+            type="text"
+            value={newItemName}
+            onChange={(e) => setNewItemName(e.target.value)}
+            placeholder="自定义物品名..."
+            className="flex-grow border border-stone-300 rounded px-2 py-1 text-sm focus:outline-none focus:border-stone-500"
+          />
+          <button type="submit" disabled={!newItemName.trim()} className="bg-stone-800 text-white px-3 py-1 rounded hover:bg-stone-700 disabled:opacity-50 disabled:cursor-not-allowed">
+            <Plus size={16} />
+          </button>
+        </form>
+      )}
     </div>
   );
 };
