@@ -6,13 +6,18 @@ export const d = (sides: number) => Math.floor(Math.random() * sides) + 1;
 export const d6 = () => d(6);
 export const d8 = () => d(8);
 export const d20 = () => d(20);
+export const d100 = () => d(100);
 
-// Generate 3d6, keep lowest as bonus
-export const rollStat = (name: StatName): Stat => {
-  const dice = [d6(), d6(), d6()];
-  const bonus = Math.min(...dice);
-  const defense = bonus + 10;
-  return { name, dice, bonus, defense };
+export const getStatByDice = (roll: number): StatName => {
+  switch (roll) {
+    case 1: return StatName.Strength;
+    case 2: return StatName.Dexterity;
+    case 3: return StatName.Constitution;
+    case 4: return StatName.Intelligence;
+    case 5: return StatName.Wisdom;
+    case 6: return StatName.Charisma;
+  }
+  return StatName.Strength;
 };
 
 // Array picker
@@ -22,8 +27,8 @@ export const pick = <T>(arr: T[]): T => arr[Math.floor(Math.random() * arr.lengt
 export const generateId = () => uuidv4();
 
 export const createItem = (
-  name: string, 
-  slots: number = 1, 
+  name: string,
+  slots: number = 1,
   type: Item['type'] = 'gear',
   props: Partial<Item> = {}
 ): Item => ({

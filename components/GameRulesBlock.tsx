@@ -69,7 +69,7 @@ const GameRulesBlock: React.FC = () => {
             <h3 className="text-xl font-bold">物品栏位 (Item Slots)</h3>
           </div>
           <div className="bg-amber-50/50 p-4 rounded text-sm space-y-2 border border-amber-100">
-            <p>PC 拥有数额等同<span className="font-bold">体质防御</span>的物品栏位。</p>
+            <p>PC 拥有<span className="font-bold"> 10 + 体质 </span>数值的物品栏位。</p>
             <ul className="list-disc list-inside space-y-1 text-stone-700">
               <li>多数物品（魔典、药水、单日口粮、轻型武器、工具等）占用 1 栏位。</li>
               <li>格外沉重硕大的物品（护甲、中型至重型武器）会占用更多栏位。</li>
@@ -214,8 +214,8 @@ const GameRulesBlock: React.FC = () => {
               <div className="bg-stone-50 p-2 rounded text-xs">
                 <p className="font-bold mb-1">升级效果：</p>
                 <ol className="list-decimal list-inside space-y-1">
-                  <li><span className="font-bold">HP：</span>投掷 新等级数×d8。若得数 &lt; 旧HP上限，则旧HP上限+1。否则使用新得数。</li>
-                  <li><span className="font-bold">属性：</span>选择3项不同的属性，让其防御和奖励各自+1 (上限20/+10)。</li>
+                  <li><span className="font-bold">HP：</span>投掷 新等级数×d6。若得数 &le; 旧HP上限，则旧HP上限+1。否则使用新得数。</li>
+                  <li><span className="font-bold">属性：</span>选择3项不同的属性，让其数值各加 1，或随机掷决定分配 (上限10)。</li>
                 </ol>
               </div>
             </div>

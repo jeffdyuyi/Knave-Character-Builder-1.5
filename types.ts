@@ -1,7 +1,6 @@
-
 export enum StatName {
   Strength = '力量',
-  Dexterity = '灵巧',
+  Dexterity = '灵巧', // Actually the rule text says '敏捷(DEX)', but I will keep '灵巧' or change to '敏捷'. The prompt says "力量(STR)... 敏捷(DEX)... 体质(CON)... 智力(INT)... 感知(WIS)... 魅力(CHA)". I will change it to '敏捷' to match Knave 2 translation.
   Constitution = '体质',
   Intelligence = '智力',
   Wisdom = '感知',
@@ -10,9 +9,7 @@ export enum StatName {
 
 export interface Stat {
   name: StatName;
-  dice: number[]; // The 3d6 rolled
-  bonus: number; // Lowest die
-  defense: number; // Bonus + 10
+  value: number; // Attribute value (0-10)
 }
 
 export interface Item {
@@ -21,9 +18,10 @@ export interface Item {
   slots: number;
   type: 'weapon' | 'armor' | 'gear' | 'food';
   description?: string;
-  defense?: number; // For armor/shields
-  damage?: string; // For weapons (e.g. "d6", "d8")
-  quality?: number; // Current durability points
+  defense?: number; // Armor Points (AP)
+  damage?: string;
+  quality?: number;
+  isWound?: boolean; // Represents a wound occupying a slot
 }
 
 export interface Traits {
@@ -51,7 +49,6 @@ export interface Character {
   stats: Record<StatName, Stat>;
   traits: Traits;
   inventory: Item[];
-  // armor object removed, derived from inventory
 }
 
 export interface CustomSpell {

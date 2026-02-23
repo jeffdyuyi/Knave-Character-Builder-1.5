@@ -13,37 +13,15 @@ const CharacterSheet: React.FC<CharacterSheetProps> = ({ character, onEdit }) =>
   const [isGenerating, setIsGenerating] = React.useState(false);
 
   // Generate empty rows for printing if inventory is not full
-  const maxSlots = character.stats[StatName.Constitution].defense;
+  const maxSlots = 10 + character.stats[StatName.Constitution].value;
   const emptySlots = Math.max(0, maxSlots - character.inventory.length);
 
-  // Calculate Armor Class from inventory
+  // Calculate Armor Class from inventory (Knave 2)
   const armorItems = character.inventory.filter(i => i.type === 'armor');
-  
-  // Logic: Body armor usually has Defense >= 10. Bonus items (shield/helm) usually have Defense <= 5.
-  // Find the single highest body armor, default to 11 (unarmored)
-  const bodyArmors = armorItems.filter(i => (i.defense || 0) >= 10);
-  
-  // Fix TS Error: Explicitly define the accumulator type to handle both the default object and Item objects
-  const bestBodyArmor = bodyArmors.reduce(
-    (prev, current) => {
-      const currentDefense = current.defense || 0;
-      return prev.defense > currentDefense 
-        ? prev 
-        : { defense: currentDefense, name: current.name };
-    }, 
-    { defense: 11, name: 'Unarmored' } as { defense: number; name: string }
-  );
-  
-  // Sum bonuses from other items (shields, helmets, or anything with defense < 10)
-  const bonuses = armorItems
-    .filter(i => (i.defense || 0) < 10)
-    .reduce((sum, i) => sum + (i.defense || 0), 0);
-  
-  const totalDefense = (bestBodyArmor.defense || 11) + bonuses;
-  const armorDescription = [
-    bestBodyArmor.name !== 'Unarmored' ? bestBodyArmor.name : '',
-    ...armorItems.filter(i => (i.defense || 0) < 10).map(i => i.name)
-  ].filter(Boolean).join(' + ');
+
+  // In Knave 2, base AC is 11, and each armor piece gives its defense points.
+  const totalDefense = 11 + armorItems.reduce((sum, i) => sum + (i.defense || 0), 0);
+  const armorDescription = armorItems.length > 0 ? armorItems.map(i => i.name).join(' + ') : '无甲 (Unarmored)';
 
   const handleDownloadPng = useCallback(async () => {
     if (sheetRef.current === null) {
@@ -55,12 +33,12 @@ const CharacterSheet: React.FC<CharacterSheetProps> = ({ character, onEdit }) =>
     try {
       // Small delay to ensure render stability if needed, though usually not strictly necessary with React
       // Using toPng from html-to-image
-      const dataUrl = await toPng(sheetRef.current, { 
-        cacheBust: true, 
+      const dataUrl = await toPng(sheetRef.current, {
+        cacheBust: true,
         backgroundColor: '#ffffff',
         pixelRatio: 2 // Higher resolution
       });
-      
+
       const link = document.createElement('a');
       link.download = `${character.name || 'Knave_Character'}_Sheet.png`;
       link.href = dataUrl;
@@ -77,15 +55,15 @@ const CharacterSheet: React.FC<CharacterSheetProps> = ({ character, onEdit }) =>
     <div className="max-w-[210mm] mx-auto">
       {/* Controls - No Print / No Capture */}
       <div className="no-print mb-6 flex justify-between items-center bg-stone-200 p-4 rounded-sm border border-stone-300 shadow-sm">
-        <button 
-          onClick={onEdit} 
+        <button
+          onClick={onEdit}
           className="flex items-center gap-2 text-stone-700 hover:text-stone-900 font-bold transition-colors"
         >
           <ArrowLeft size={20} />
           返回编辑 (Back)
         </button>
-        <button 
-          onClick={handleDownloadPng} 
+        <button
+          onClick={handleDownloadPng}
           disabled={isGenerating}
           className="flex items-center gap-2 bg-stone-800 text-white px-6 py-2 rounded shadow hover:bg-stone-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
         >
@@ -112,22 +90,20 @@ const CharacterSheet: React.FC<CharacterSheetProps> = ({ character, onEdit }) =>
 
         {/* Main Grid */}
         <div className="grid grid-cols-12 gap-6 flex-grow">
-          
+
           {/* Left Column: Stats */}
           <div className="col-span-4 flex flex-col gap-6">
-            
+
             {/* Attributes Table */}
             <div className="border-2 border-black">
-              <div className="grid grid-cols-4 bg-black text-white text-xs font-bold p-1 text-center uppercase">
-                <div>Def.</div>
-                <div className="col-span-2">Attribute</div>
-                <div>Bonus</div>
+              <div className="grid grid-cols-3 bg-black text-white text-xs font-bold p-1 text-center uppercase">
+                <div className="col-span-2 text-left px-2">Attribute</div>
+                <div>Value</div>
               </div>
               {(Object.values(character.stats) as Stat[]).map((stat) => (
-                <div key={stat.name} className="grid grid-cols-4 border-b border-stone-300 last:border-0 text-center items-center h-10">
-                   <div className="font-bold text-lg border-r border-stone-300">{stat.defense}</div>
-                   <div className="col-span-2 font-serif font-bold text-lg uppercase tracking-wide">{stat.name}</div>
-                   <div className="font-bold text-lg border-l border-stone-300">+{stat.bonus}</div>
+                <div key={stat.name} className="grid grid-cols-3 border-b border-stone-300 last:border-0 text-center items-center h-10">
+                  <div className="col-span-2 text-left px-2 font-serif font-bold text-lg uppercase tracking-wide">{stat.name}</div>
+                  <div className="font-bold text-lg border-l border-stone-300">{stat.value}</div>
                 </div>
               ))}
             </div>
@@ -151,8 +127,8 @@ const CharacterSheet: React.FC<CharacterSheetProps> = ({ character, onEdit }) =>
               </div>
             </div>
 
-             {/* Traits List */}
-             <div className="border-2 border-black p-4 text-sm font-serif flex-grow">
+            {/* Traits List */}
+            <div className="border-2 border-black p-4 text-sm font-serif flex-grow">
               <h3 className="font-bold uppercase border-b border-black mb-2">Traits</h3>
               <ul className="space-y-1">
                 {Object.entries(character.traits).map(([key, value]) => (
@@ -169,43 +145,43 @@ const CharacterSheet: React.FC<CharacterSheetProps> = ({ character, onEdit }) =>
           {/* Right Column: Inventory */}
           <div className="col-span-8 flex flex-col h-full">
             <div className="border-2 border-black h-full flex flex-col">
-               <div className="bg-black text-white font-bold p-2 uppercase flex justify-between items-center shrink-0">
-                 <span>Inventory Slots</span>
-                 <span className="text-xs font-normal opacity-75">Max: {maxSlots}</span>
-               </div>
-               
-               {/* Inventory Rows */}
-               <div className="flex flex-col flex-grow">
-                 {character.inventory.map((item, idx) => (
-                   <div key={item.id} className="flex border-b border-stone-400 min-h-[40px] items-center px-2 py-1">
-                     <div className="w-8 font-mono text-stone-400 text-xs flex-shrink-0">{idx + 1}.</div>
-                     <div className="flex-grow font-serif text-lg leading-tight">
-                       {item.name}
-                       {/* Show Stats inline for sheet */}
-                       <span className="text-sm text-stone-500 ml-2">
-                          {item.type === 'weapon' && item.damage && `(${item.damage})`}
-                          {item.type === 'armor' && item.defense && item.defense >= 10 && `(AC ${item.defense})`}
-                          {item.type === 'armor' && item.defense && item.defense < 10 && `(+${item.defense} AC)`}
-                       </span>
-                     </div>
-                     {item.quality !== undefined && (
-                        <div className="w-16 text-center text-xs text-stone-500 border-l border-r border-stone-200 mx-2">
-                           Q: {item.quality}
-                        </div>
-                     )}
-                     <div className="w-12 text-center text-xs flex-shrink-0">
-                       {item.slots > 1 ? `${item.slots} slots` : ''}
-                     </div>
-                   </div>
-                 ))}
-                 {/* Empty Rows */}
-                 {Array.from({ length: emptySlots }).map((_, idx) => (
-                   <div key={`empty-${idx}`} className="flex border-b border-stone-400 h-10 items-center px-2 opacity-50 last:border-b-0">
-                      <div className="w-8 font-mono text-stone-300 text-xs">{character.inventory.length + idx + 1}.</div>
-                      <div className="flex-grow border-b border-stone-200 border-dotted h-6"></div>
-                   </div>
-                 ))}
-               </div>
+              <div className="bg-black text-white font-bold p-2 uppercase flex justify-between items-center shrink-0">
+                <span>Inventory Slots</span>
+                <span className="text-xs font-normal opacity-75">Max: {maxSlots}</span>
+              </div>
+
+              {/* Inventory Rows */}
+              <div className="flex flex-col flex-grow">
+                {character.inventory.map((item, idx) => (
+                  <div key={item.id} className="flex border-b border-stone-400 min-h-[40px] items-center px-2 py-1">
+                    <div className="w-8 font-mono text-stone-400 text-xs flex-shrink-0">{idx + 1}.</div>
+                    <div className="flex-grow font-serif text-lg leading-tight">
+                      {item.name}
+                      {/* Show Stats inline for sheet */}
+                      <span className="text-sm text-stone-500 ml-2">
+                        {item.type === 'weapon' && item.damage && `(${item.damage})`}
+                        {item.type === 'armor' && item.defense && item.defense >= 10 && `(AC ${item.defense})`}
+                        {item.type === 'armor' && item.defense && item.defense < 10 && `(+${item.defense} AC)`}
+                      </span>
+                    </div>
+                    {item.quality !== undefined && (
+                      <div className="w-16 text-center text-xs text-stone-500 border-l border-r border-stone-200 mx-2">
+                        Q: {item.quality}
+                      </div>
+                    )}
+                    <div className="w-12 text-center text-xs flex-shrink-0">
+                      {item.slots > 1 ? `${item.slots} slots` : ''}
+                    </div>
+                  </div>
+                ))}
+                {/* Empty Rows */}
+                {Array.from({ length: emptySlots }).map((_, idx) => (
+                  <div key={`empty-${idx}`} className="flex border-b border-stone-400 h-10 items-center px-2 opacity-50 last:border-b-0">
+                    <div className="w-8 font-mono text-stone-300 text-xs">{character.inventory.length + idx + 1}.</div>
+                    <div className="flex-grow border-b border-stone-200 border-dotted h-6"></div>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
 
@@ -214,8 +190,8 @@ const CharacterSheet: React.FC<CharacterSheetProps> = ({ character, onEdit }) =>
         <div className="mt-auto pt-6 text-xs text-center text-stone-400 font-serif shrink-0 space-y-1">
           <p>Knave by Ben Milton. Created with Knave Character Builder.</p>
           <div className="flex justify-center gap-4 opacity-75 scale-90">
-             <span>成都线下跑团群：691707475</span>
-             <span>不咕鸟创作交流群：261751459</span>
+            <span>成都线下跑团群：691707475</span>
+            <span>不咕鸟创作交流群：261751459</span>
           </div>
         </div>
       </div>

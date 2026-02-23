@@ -5,17 +5,23 @@ import { Search, ScrollText, Coins, Sparkles, Book, ShieldAlert } from 'lucide-r
 const ReferenceBlock: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'spells' | 'items'>('spells');
   const [filter, setFilter] = useState('');
+  const [randomResult, setRandomResult] = useState<string | null>(null);
 
   const filteredSpells = SPELLS_DATA.filter(s => s.name.toLowerCase().includes(filter.toLowerCase()));
-  
+
+  const rollRandomSpell = () => {
+    const spell = SPELLS_DATA[Math.floor(Math.random() * SPELLS_DATA.length)];
+    setRandomResult(`🎲 你掷出了随机法术: ${spell.name} - ${spell.desc}`);
+  };
+
   return (
     <div className="bg-white rounded-sm shadow-md border-2 border-stone-800 flex flex-col min-h-[500px]">
       {/* Header/Tabs */}
       <div className="bg-stone-900 text-white px-4 py-3 border-b-2 border-amber-600 flex justify-between items-center sticky top-0 z-10">
-         <div>
+        <div>
           <h2 className="text-2xl font-bold font-serif tracking-wider">速查表</h2>
           <span className="text-stone-400 text-sm font-serif italic">Quick Reference - 法术与物品</span>
-         </div>
+        </div>
       </div>
       <div className="flex border-b-2 border-stone-800 bg-stone-100 sticky top-[74px] z-10">
         <button
@@ -40,14 +46,29 @@ const ReferenceBlock: React.FC = () => {
       <div className="p-4 border-b border-stone-200 bg-stone-50">
         <div className="relative">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-stone-400" size={18} />
-          <input 
-            type="text" 
+          <input
+            type="text"
             placeholder={activeTab === 'spells' ? "搜索法术..." : "搜索物品..."}
             value={filter}
             onChange={(e) => setFilter(e.target.value)}
             className="w-full pl-10 pr-4 py-2 border border-stone-300 rounded focus:outline-none focus:border-stone-600 font-serif"
           />
         </div>
+        {activeTab === 'spells' && (
+          <div className="mt-4 flex flex-col gap-2">
+            <button
+              onClick={rollRandomSpell}
+              className="px-4 py-2 bg-amber-700 text-white font-bold rounded hover:bg-amber-800 transition-colors self-start"
+            >
+              🎲 掷骰获取随机法术 (d100)
+            </button>
+            {randomResult && (
+              <div className="p-3 bg-amber-100 text-amber-900 border border-amber-300 rounded mt-2 font-serif shadow-sm">
+                {randomResult}
+              </div>
+            )}
+          </div>
+        )}
       </div>
 
       {/* Content - No fixed height, no overflow-y-auto */}
@@ -63,14 +84,14 @@ const ReferenceBlock: React.FC = () => {
                 <p>{MAGIC_RULES.intro}</p>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
                   <div className="bg-white/50 p-3 rounded border border-amber-100">
-                     <strong className="block text-amber-800 mb-1 flex items-center gap-1"><Book size={14}/> 施法与魔典</strong>
-                     {MAGIC_RULES.casting}
-                     <br/><br/>
-                     {MAGIC_RULES.grimoires}
+                    <strong className="block text-amber-800 mb-1 flex items-center gap-1"><Book size={14} /> 施法与魔典</strong>
+                    {MAGIC_RULES.casting}
+                    <br /><br />
+                    {MAGIC_RULES.grimoires}
                   </div>
                   <div className="bg-white/50 p-3 rounded border border-amber-100 h-fit">
-                     <strong className="block text-amber-800 mb-1 flex items-center gap-1"><ShieldAlert size={14}/> 豁免检定</strong>
-                     {MAGIC_RULES.saves}
+                    <strong className="block text-amber-800 mb-1 flex items-center gap-1"><ShieldAlert size={14} /> 豁免检定</strong>
+                    {MAGIC_RULES.saves}
                   </div>
                 </div>
               </div>
@@ -80,8 +101,8 @@ const ReferenceBlock: React.FC = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
               {filteredSpells.length > 0 ? (
                 filteredSpells.map((spell, idx) => (
-                  <div 
-                    key={idx} 
+                  <div
+                    key={idx}
                     className="group relative p-3 border border-stone-200 hover:bg-stone-50 hover:border-stone-400 rounded transition-colors"
                   >
                     <div className="flex gap-2 items-baseline mb-1">
@@ -101,7 +122,7 @@ const ReferenceBlock: React.FC = () => {
             {Object.entries(ITEM_PRICES).map(([category, items]) => {
               const filteredItems = items.filter(i => i.name.toLowerCase().includes(filter.toLowerCase()));
               if (filteredItems.length === 0) return null;
-              
+
               return (
                 <div key={category}>
                   <h3 className="font-bold text-stone-900 border-b-2 border-stone-800 mb-2 pb-1 font-serif text-xl">{category}</h3>
@@ -116,9 +137,9 @@ const ReferenceBlock: React.FC = () => {
                 </div>
               );
             })}
-             {Object.values(ITEM_PRICES).flat().filter(i => i.name.toLowerCase().includes(filter.toLowerCase())).length === 0 && (
-                 <div className="text-center py-8 text-stone-400 italic">未找到匹配的物品</div>
-             )}
+            {Object.values(ITEM_PRICES).flat().filter(i => i.name.toLowerCase().includes(filter.toLowerCase())).length === 0 && (
+              <div className="text-center py-8 text-stone-400 italic">未找到匹配的物品</div>
+            )}
             <div className="text-xs text-stone-500 mt-4 border-t pt-2">
               注：所有价格均以铜便士(c)计算。对于船只、房地产等物的回报通常表现为以易货、馈赠或宣誓效忠，而非钱币。
             </div>

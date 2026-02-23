@@ -27,19 +27,11 @@ const InventoryBlock: React.FC<InventoryBlockProps> = ({
   const totalSlotsUsed = inventory.reduce((sum, item) => sum + item.slots, 0);
   const isOverencumbered = totalSlotsUsed > maxSlots;
 
-  // Calculate Total Armor Defense
+  // Calculate Total Armor Defense (Knave 2)
   const armorItems = inventory.filter(i => i.type === 'armor');
 
-  // Find base AC from body armor (Defense >= 10). Default is 11 (Unarmored).
-  const bodyArmors = armorItems.filter(i => (i.defense || 0) >= 10);
-  const baseAC = bodyArmors.reduce((max, item) => Math.max(max, item.defense || 0), 11);
-
-  // Sum bonuses from accessories (shields/helmets, Defense < 10).
-  const bonusAC = armorItems
-    .filter(i => (i.defense || 0) < 10)
-    .reduce((sum, i) => sum + (i.defense || 0), 0);
-
-  const totalDefense = baseAC + bonusAC;
+  // Base AC is 11, each piece adds to it.
+  const totalDefense = 11 + armorItems.reduce((sum, item) => sum + (item.defense || 0), 0);
 
   const handleAddCustom = (e: React.FormEvent) => {
     e.preventDefault();
