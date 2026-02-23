@@ -23,11 +23,11 @@ const GameRulesBlock: React.FC = () => {
           <p className="mb-4 text-stone-600 italic text-sm">这六项属性用于不同情形：</p>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <AttributeCard title="力量 (Strength)" desc="战士能力。用于近战攻击和涉及身体机能的检定，譬如举起大门、掰弯铁杆等等。" />
-            <AttributeCard title="灵巧 (Dexterity)" desc="盗贼能力。用于涉及姿势、速度、反射的检定，譬如闪避、攀爬、前行、平衡等等。" />
-            <AttributeCard title="体质 (Constitution)" desc="冒险者能力。用于抵抗毒素、疾病、寒冷等等。体质奖励会加到治疗投骰中。一名 PC 的物品栏位数额永远等同体质防御。" />
-            <AttributeCard title="智力 (Intelligence)" desc="魔法使用者能力。用于涉及专注、精密的检定，譬如施展魔法、抵抗魔法效果、回忆逸闻、打造物件、修理机械、扒窃等等。" />
-            <AttributeCard title="感知 (Wisdom)" desc="游侠能力。用于远程攻击和涉及察觉、直觉的检定，譬如追踪导航、搜索暗门、侦测幻象等等。" />
-            <AttributeCard title="魅力 (Charisma)" desc="牧师能力。用于说服、欺瞒、审问、恐吓、魅惑、激怒等等。PC 能雇佣魅力奖励数额的随从。" />
+            <AttributeCard title="灵巧 (Dexterity)" desc="盗贼能力。用于涉及姿势、速度、反射的检定，譬如闪避、攀爬、潜行、平衡、扒窃、戏法等等。" />
+            <AttributeCard title="体质 (Constitution)" desc="冒险者能力。对每个玩家角色都很重要。用于抵抗毒素、疾病、寒冷等等的检定。玩家角色拥有 10 + 体质的物品槽，并且可以承受 10 + 体质的伤口而不死。" />
+            <AttributeCard title="智力 (Intelligence)" desc="魔法使用者能力。用于涉及专注、精密的检定，譬如开锁、炼金术、施展魔法、抵抗魔法效果、回忆逸闻、打造物件、修理机械等等。智力提高法术的效果，玩家角色每天可以施展等同于智力值的法术数量。" />
+            <AttributeCard title="感知 (Wisdom)" desc="游侠能力。用于远程攻击和涉及察觉、直觉的检定，譬如觅食、追踪导航、搜索暗门、侦测幻象和抵抗法术。" />
+            <AttributeCard title="魅力 (Charisma)" desc="牧师能力。用于需要个性影响力的检定，譬如说服、欺瞒、审问、恐吓、魅惑、激怒等等。玩家角色可以拥有等同于其魅力值的随从和庇护祝福。" />
           </div>
         </section>
 
