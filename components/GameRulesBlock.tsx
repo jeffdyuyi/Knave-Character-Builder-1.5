@@ -31,31 +31,33 @@ const GameRulesBlock: React.FC = () => {
           </div>
         </section>
 
-        {/* 2. 检定与豁免 (Checks & Saves) */}
+        {/* 2. 检定 (Checks) */}
         <section className="mb-8 bg-white p-6 rounded border border-stone-200 shadow-sm">
           <div className="flex items-center gap-2 border-b border-stone-300 pb-2 mb-4">
             <Scale className="text-amber-700" size={20} />
-            <h3 className="text-xl font-bold">豁免 (Saves)</h3>
+            <h3 className="text-xl font-bold">检定 (Checks)</h3>
           </div>
           <div className="space-y-4 text-sm leading-relaxed">
             <p>
-              若某角色试图做出结果不确定且失败有后果的事情，需要进行一次<span className="font-bold text-stone-900">豁免</span>。
+              若某角色试图做出结果不确定且失败有后果的事情，需要进行一次<span className="font-bold text-stone-900">检定</span>。
             </p>
             <div className="p-3 bg-stone-100 border border-stone-300 rounded text-center font-bold text-lg font-mono">
-              豁免得数 = 1d20 + 相关属性奖励 &gt; 15
+              检定得数 = 1d20 + 能力值 + 修正 &ge; 11 + 任务难度(通常为5)
             </div>
-            <AuthorNote>
-              需求豁免超过15意味着新PC有25%成功率，而10级角色有约75%成功率，因为10级能有+10属性奖励。这反映了取自早期D&D豁免机制的通用模式。
-            </AuthorNote>
 
             <div className="mt-4">
-              <strong className="block text-base mb-1">对抗豁免 (Opposed Saves)</strong>
-              <p>若豁免对抗另一角色，则不再以超过15为目标，而是改为：<span className="font-bold">投骰方的得数 &gt; 对方的相关防御值</span>。若投骰方失败，则对方成功。</p>
+              <strong className="block text-base mb-1">对抗检定 (Opposed Checks)</strong>
+              <p>对抗的能力值和护甲点数可以作为任务难度。如果生物没有能力值，则替代为其等级、一半等级或0（由裁判决定）。</p>
             </div>
 
             <div className="mt-4">
               <strong className="block text-base mb-1">优势与劣势</strong>
-              <p>若情境因素使豁免明显更易或更难，裁判可授予投骰<span className="font-bold">优势</span>或<span className="font-bold">劣势</span>。若投骰有优势，投2d20并采用较高者。若投骰有劣势，投2d20并采用较低者。</p>
+              <p>来自优势、劣势或职业的修正在投骰中体现为<span className="font-bold text-amber-700">&plusmn;5 增量</span>，不再是投2d20取高低。</p>
+            </div>
+
+            <div className="mt-4 p-3 bg-blue-50/50 border border-blue-200 rounded">
+              <strong className="block text-base mb-1 text-blue-900">角色知识 (Character Knowledge)</strong>
+              <p className="text-blue-800">不要进行所谓的“知识检定”。玩家角色知道所有常识和与职业相关的知识。所有其他知识必须被寻找。</p>
             </div>
           </div>
         </section>
@@ -101,7 +103,7 @@ const GameRulesBlock: React.FC = () => {
                 <h4 className="font-bold text-lg mb-2">攻击与伤害</h4>
                 <p className="text-sm mb-2">近战武器使用<span className="font-bold">力量</span>，远程武器使用<span className="font-bold">感知</span>。</p>
                 <div className="p-2 bg-stone-100 border border-stone-300 rounded text-center text-sm font-mono mb-2">
-                  攻击得数 = 1d20 + 属性奖励 &gt; 目标护甲防御(AC)
+                  攻击得数 = 1d20 + 能力值 + 修正 &ge; 11 + 目标护甲点数(作为难度)
                 </div>
                 <p className="text-sm mb-2">命中时，投掷武器伤害骰。若武器合适（如钝器对抗骷髅），可增加相应奖励伤害骰。</p>
                 <div className="text-sm border-t border-stone-100 pt-2 mt-2">
@@ -115,12 +117,12 @@ const GameRulesBlock: React.FC = () => {
             <div className="space-y-6">
               <div className="bg-white p-4 rounded border border-stone-200">
                 <h4 className="font-bold text-lg mb-2">绝招与优势</h4>
-                <p className="text-sm mb-2"><span className="font-bold">绝招：</span>击晕、推搡、缴械等花招。按照豁免对抗结算。</p>
+                <p className="text-sm mb-2"><span className="font-bold">绝招：</span>击晕、推搡、缴械等花招。按照对抗检定结算。</p>
                 <div className="bg-amber-50 p-3 rounded border border-amber-100">
                   <strong className="block text-sm mb-1 text-amber-900">战斗优势 (Combat Advantage)</strong>
                   <p className="text-xs mb-2">若是角色在战斗中对付某个目标时带有优势（缺乏防备、位于低处、丧失平衡等），则可选择：</p>
                   <ul className="text-xs space-y-1 font-bold text-stone-800">
-                    <li>【A】对目标的攻击投骰或绝招获得优势；</li>
+                    <li>【A】对目标的攻击投骰或绝招获得优势（+5 修正）；</li>
                     <li>【B】在同一轮中对该目标进行无优势的一次攻击<span className="text-red-700">和</span>一次特技尝试。</li>
                   </ul>
                 </div>
