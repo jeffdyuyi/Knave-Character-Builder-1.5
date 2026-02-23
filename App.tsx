@@ -177,7 +177,7 @@ const App: React.FC = () => {
       newInventory.push(createItem("自选近战武器", 1, 'weapon', { damage: 'd6', quality: 3 }));
     } else {
       const armors = ["盾牌", "头盔", "布面甲", "锁子甲衫", "胸甲", "臂甲", "腿甲"];
-      newInventory.push(createItem(pick(armors), 1, 'armor', { defense: 1, quality: 3 }));
+      newInventory.push(createItem(pick(armors), 1, 'armor', { defense: 1, quality: 1 }));
     }
 
     // Spellbooks based on Intelligence

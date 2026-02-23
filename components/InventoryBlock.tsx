@@ -24,20 +24,21 @@ const InventoryBlock: React.FC<InventoryBlockProps> = ({
   const [newItemName, setNewItemName] = React.useState('');
   const [selectedPreset, setSelectedPreset] = React.useState('');
 
-  const totalSlotsUsed = inventory.reduce((sum, item) => sum + item.slots, 0);
+  const totalSlotsUsed = inventory.reduce((sum, item) => sum + (item.slots || 0), 0);
   const isOverencumbered = totalSlotsUsed > maxSlots;
 
   // Calculate Total Armor Defense (Knave 2)
   const armorItems = inventory.filter(i => i.type === 'armor');
 
-  // Base AC is 11, each piece adds to it.
-  const totalDefense = 11 + armorItems.reduce((sum, item) => sum + (item.defense || 0), 0);
+  // Base AC is 11, each armor piece adds its AP. The maximum AC is 18.
+  const totalAp = armorItems.reduce((sum, item) => sum + (item.defense || 0), 0);
+  const totalDefense = Math.min(18, 11 + totalAp);
 
   const handleAddCustom = (e: React.FormEvent) => {
     e.preventDefault();
     if (!newItemName.trim()) return;
     onAddItem({
-      id: Math.random().toString(36).substr(2, 9),
+      id: crypto.randomUUID(),
       name: newItemName,
       slots: 1,
       type: 'gear',
@@ -50,7 +51,6 @@ const InventoryBlock: React.FC<InventoryBlockProps> = ({
     e.preventDefault();
     if (!selectedPreset) return;
 
-    // Find the item
     let foundItem = null;
     let category = '';
     for (const [cat, items] of Object.entries(ITEM_PRICES)) {
@@ -64,42 +64,19 @@ const InventoryBlock: React.FC<InventoryBlockProps> = ({
 
     if (!foundItem) return;
 
-    let parsedName = foundItem.name.split(' (')[0];
-    let type: 'gear' | 'armor' | 'weapon' = 'gear';
-    let defense: number | undefined = undefined;
-    let damage: string | undefined = undefined;
-    let slots = 1;
-    let quality = 3;
-
-    if (category === '护甲') {
-      type = 'armor';
-      const defMatch1 = foundItem.name.match(/防御\+(\d+)/);
-      const defMatch2 = foundItem.name.match(/防御(\d+)/);
-      if (defMatch1) defense = parseInt(defMatch1[1]);
-      else if (defMatch2) defense = parseInt(defMatch2[1]);
-    } else if (category === '武器') {
-      type = 'weapon';
-      const dmgMatch = foundItem.name.match(/(d\d+)伤害/);
-      if (dmgMatch) damage = dmgMatch[1];
-    }
-
-    const slotMatch = foundItem.name.match(/(\d+)栏位/);
-    if (slotMatch) slots = parseInt(slotMatch[1]);
-
-    const qualMatch = foundItem.name.match(/(\d+)耐久/);
-    if (qualMatch) quality = parseInt(qualMatch[1]);
+    const parsedName = foundItem.name.split(' (')[0];
+    const type: 'gear' | 'armor' | 'weapon' = category === '护甲' ? 'armor' : category === '武器' ? 'weapon' : 'gear';
 
     onAddItem({
-      id: Math.random().toString(36).substr(2, 9),
+      id: crypto.randomUUID(),
       name: parsedName,
-      slots: slots,
-      type: type,
-      quality: quality,
-      defense: defense,
-      damage: damage
+      slots: parseInt(foundItem.name.match(/(\d+)栏位/)?.[1] || '1', 10),
+      type,
+      quality: parseInt(foundItem.name.match(/(\d+)耐久/)?.[1] || '3', 10),
+      defense: category === '护甲' ? parseInt(foundItem.name.match(/防御\+?(\d+)/)?.[1] || '0', 10) : undefined,
+      damage: category === '武器' ? foundItem.name.match(/(d\d+)伤害/)?.[1] : undefined
     });
 
-    // reset selection so user can add again or add another
     setSelectedPreset('');
   };
 
@@ -145,11 +122,11 @@ const InventoryBlock: React.FC<InventoryBlockProps> = ({
                   <div className="flex items-center gap-2 flex-grow">
                     {/* Slot Count */}
                     <button
-                      onClick={() => onUpdateItem(item.id, { slots: Math.max(0, item.slots + 1) % 10 })}
+                      onClick={() => onUpdateItem(item.id, { slots: Math.max(0, (item.slots || 0) + 1) % 10 })}
                       title="点击修改占用栏位"
                       className="w-6 h-6 flex-shrink-0 flex items-center justify-center bg-stone-200 hover:bg-stone-300 rounded-full text-xs font-bold text-stone-600 transition-colors"
                     >
-                      {item.slots}
+                      {item.slots || 0}
                     </button>
 
                     {/* Item Name */}
@@ -201,7 +178,7 @@ const InventoryBlock: React.FC<InventoryBlockProps> = ({
                             value={item.defense === undefined ? '' : item.defense}
                             onChange={(e) => {
                               const val = e.target.value;
-                              onUpdateItem(item.id, { defense: val === '' ? 0 : parseInt(val) || 0 });
+                              onUpdateItem(item.id, { defense: val === '' ? 0 : parseInt(val, 10) || 0 });
                             }}
                             className="w-8 border-b border-stone-300 bg-transparent text-center focus:outline-none focus:border-stone-800 text-stone-900 font-bold"
                           />
@@ -236,7 +213,7 @@ const InventoryBlock: React.FC<InventoryBlockProps> = ({
                       value={item.quality === undefined ? '' : item.quality}
                       onChange={(e) => {
                         const val = e.target.value;
-                        onUpdateItem(item.id, { quality: val === '' ? 0 : parseInt(val) || 0 });
+                        onUpdateItem(item.id, { quality: val === '' ? 0 : parseInt(val, 10) || 0 });
                       }}
                       className="w-6 border-b border-stone-300 bg-transparent text-center focus:outline-none focus:border-stone-800 text-stone-900 font-bold"
                     />
