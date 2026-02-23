@@ -1,10 +1,10 @@
 
 export enum StatName {
   Strength = '力量',
-  Dexterity = '敏捷',
+  Dexterity = '灵巧',
   Constitution = '体质',
   Intelligence = '智力',
-  Wisdom = '睿知',
+  Wisdom = '感知',
   Charisma = '魅力',
 }
 
