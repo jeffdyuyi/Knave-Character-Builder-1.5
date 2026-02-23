@@ -166,7 +166,7 @@ const CharacterSheet: React.FC<CharacterSheetProps> = ({ character, onEdit }) =>
                     </div>
                     {item.quality !== undefined && (
                       <div className="w-16 text-center text-xs text-stone-500 border-l border-r border-stone-200 mx-2">
-                        Q: {item.quality}
+                        耐久: {item.quality}
                       </div>
                     )}
                     <div className="w-12 text-center text-xs flex-shrink-0">

@@ -188,55 +188,65 @@ const InventoryBlock: React.FC<InventoryBlockProps> = ({
                 </div>
 
                 {/* Conditional Stats Row */}
-                {(item.type === 'armor' || item.type === 'weapon') && (
-                  <div className="ml-8 flex gap-4 text-xs items-center text-stone-500 bg-stone-50/50 p-1 rounded">
+                <div className="ml-8 mt-1 flex gap-4 text-xs items-center text-stone-500 bg-stone-50/50 p-1 rounded flex-wrap">
 
-                    {item.type === 'armor' && (
-                      <div className="flex items-center gap-1">
-                        <span className="uppercase font-bold text-[10px]">Def:</span>
-                        <input
-                          type="number"
-                          placeholder="0"
-                          value={item.defense === undefined ? '' : item.defense}
-                          onChange={(e) => {
-                            const val = e.target.value;
-                            onUpdateItem(item.id, { defense: val === '' ? 0 : parseInt(val) || 0 });
-                          }}
-                          className="w-8 border-b border-stone-300 bg-transparent text-center focus:outline-none focus:border-stone-800 text-stone-900 font-bold"
-                        />
-                      </div>
-                    )}
+                  {(item.type === 'armor' || item.type === 'weapon') && (
+                    <>
+                      {item.type === 'armor' && (
+                        <div className="flex items-center gap-1">
+                          <span className="uppercase font-bold text-[10px] text-blue-700">AP:</span>
+                          <input
+                            type="number"
+                            placeholder="0"
+                            value={item.defense === undefined ? '' : item.defense}
+                            onChange={(e) => {
+                              const val = e.target.value;
+                              onUpdateItem(item.id, { defense: val === '' ? 0 : parseInt(val) || 0 });
+                            }}
+                            className="w-8 border-b border-stone-300 bg-transparent text-center focus:outline-none focus:border-stone-800 text-stone-900 font-bold"
+                          />
+                        </div>
+                      )}
 
-                    {item.type === 'weapon' && (
-                      <div className="flex items-center gap-1">
-                        <span className="uppercase font-bold text-[10px]">Dmg:</span>
-                        <input
-                          type="text"
-                          placeholder="d6"
-                          value={item.damage || ''}
-                          onChange={(e) => onUpdateItem(item.id, { damage: e.target.value })}
-                          className="w-12 border-b border-stone-300 bg-transparent text-center focus:outline-none focus:border-stone-800 text-stone-900 font-bold"
-                        />
-                      </div>
-                    )}
+                      {item.type === 'weapon' && (
+                        <div className="flex items-center gap-1">
+                          <span className="uppercase font-bold text-[10px] text-red-700">Dmg:</span>
+                          <input
+                            type="text"
+                            placeholder="d6"
+                            value={item.damage || ''}
+                            onChange={(e) => onUpdateItem(item.id, { damage: e.target.value })}
+                            className="w-12 border-b border-stone-300 bg-transparent text-center focus:outline-none focus:border-stone-800 text-stone-900 font-bold"
+                          />
+                        </div>
+                      )}
+                    </>
+                  )}
 
-                    <div className="flex items-center gap-1">
-                      <Hammer size={10} className="text-stone-400" />
-                      <span className="uppercase font-bold text-[10px]">Qual:</span>
-                      <input
-                        type="number"
-                        placeholder="3"
-                        value={item.quality === undefined ? '' : item.quality}
-                        onChange={(e) => {
-                          const val = e.target.value;
-                          onUpdateItem(item.id, { quality: val === '' ? 0 : parseInt(val) || 0 });
-                        }}
-                        className="w-8 border-b border-stone-300 bg-transparent text-center focus:outline-none focus:border-stone-800 text-stone-900 font-bold"
-                      />
-                    </div>
-
+                  <div className="flex items-center gap-1">
+                    <Hammer size={10} className="text-stone-400" />
+                    <span className="font-bold text-[10px] text-amber-700">耐久:</span>
+                    <button
+                      onClick={() => onUpdateItem(item.id, { quality: Math.max(0, (item.quality || 0) - 1) })}
+                      className="w-4 h-4 flex items-center justify-center bg-stone-200 rounded-full hover:bg-stone-300"
+                    >-</button>
+                    <input
+                      type="number"
+                      placeholder="3"
+                      value={item.quality === undefined ? '' : item.quality}
+                      onChange={(e) => {
+                        const val = e.target.value;
+                        onUpdateItem(item.id, { quality: val === '' ? 0 : parseInt(val) || 0 });
+                      }}
+                      className="w-6 border-b border-stone-300 bg-transparent text-center focus:outline-none focus:border-stone-800 text-stone-900 font-bold"
+                    />
+                    <button
+                      onClick={() => onUpdateItem(item.id, { quality: (item.quality || 0) + 1 })}
+                      className="w-4 h-4 flex items-center justify-center bg-stone-200 rounded-full hover:bg-stone-300"
+                    >+</button>
                   </div>
-                )}
+
+                </div>
               </li>
             ))}
           </ul>
