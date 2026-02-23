@@ -49,6 +49,7 @@ export interface Character {
   stats: Record<StatName, Stat>;
   traits: Traits;
   inventory: Item[];
+  memo?: string;
 }
 
 export interface CustomSpell {

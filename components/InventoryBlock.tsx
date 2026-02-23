@@ -202,7 +202,7 @@ const InventoryBlock: React.FC<InventoryBlockProps> = ({
 
                   <div className="flex items-center gap-1">
                     <Hammer size={10} className="text-stone-400" />
-                    <span className="font-bold text-[10px] text-amber-700">耐久:</span>
+                    <span className="font-bold text-[10px] text-amber-700" title="设置为0时在角色卡上隐藏 (Hide on sheet if 0)">耐久:</span>
                     <button
                       onClick={() => onUpdateItem(item.id, { quality: Math.max(0, (item.quality || 0) - 1) })}
                       className="w-4 h-4 flex items-center justify-center bg-stone-200 rounded-full hover:bg-stone-300"

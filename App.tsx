@@ -28,7 +28,8 @@ import InventoryBlock from './components/InventoryBlock';
 import CharacterSheet from './components/CharacterSheet';
 import ReferenceBlock from './components/ReferenceBlock';
 import GameRulesBlock from './components/GameRulesBlock';
-import { Dices, Printer, RefreshCw, BookOpen, PenTool, List, ExternalLink } from 'lucide-react';
+import MemoBlock from './components/MemoBlock';
+import { Dices, Printer, RefreshCw, BookOpen, PenTool, List, ExternalLink, StickyNote } from 'lucide-react';
 
 const generateInitialCharacter = (): Character => {
   // Generate Stats (Knave 2: distribute 3 points randomly)
@@ -67,6 +68,7 @@ const generateInitialCharacter = (): Character => {
       virtue: '', vice: '', speech: '', background: '', misfortune: '', alignment: ''
     },
     inventory: [],
+    memo: '',
   };
 };
 
@@ -84,7 +86,7 @@ const App: React.FC = () => {
     }
     return generateInitialCharacter();
   });
-  const [viewMode, setViewMode] = useState<'edit' | 'sheet' | 'rules' | 'tables'>('edit');
+  const [viewMode, setViewMode] = useState<'edit' | 'sheet' | 'rules' | 'tables' | 'memo'>('edit');
 
   // Persistence
   useEffect(() => {
@@ -303,6 +305,14 @@ const App: React.FC = () => {
               <span className="text-[10px] sm:text-xs font-bold mt-1">速查</span>
             </button>
             <button
+              onClick={() => setViewMode('memo')}
+              className={`flex flex-col items-center justify-center w-16 h-16 sm:w-20 sm:h-20 rounded-full transition-all ${viewMode === 'memo' ? 'bg-stone-800 text-white shadow-inner' : 'text-stone-600 hover:bg-stone-100'}`}
+              title="个人备忘录"
+            >
+              <StickyNote size={20} className="sm:w-6 sm:h-6" />
+              <span className="text-[10px] sm:text-xs font-bold mt-1">备忘</span>
+            </button>
+            <button
               onClick={() => setViewMode('sheet')}
               className="flex flex-col items-center justify-center bg-blue-700 text-white w-16 h-16 sm:w-20 sm:h-20 rounded-full shadow-lg hover:bg-blue-600 hover:scale-105 transition-all ml-2"
               title="查看角色卡"
@@ -318,6 +328,12 @@ const App: React.FC = () => {
       <div className="flex-grow">
         {viewMode === 'rules' && <GameRulesBlock />}
         {viewMode === 'tables' && <ReferenceBlock />}
+        {viewMode === 'memo' && (
+          <MemoBlock
+            memo={character.memo || ''}
+            onChange={(val) => setCharacter(prev => ({ ...prev, memo: val }))}
+          />
+        )}
 
         {viewMode === 'edit' && (
           <main className="grid grid-cols-1 lg:grid-cols-3 gap-6">

@@ -89,102 +89,129 @@ const CharacterSheet: React.FC<CharacterSheetProps> = ({ character, onEdit }) =>
         </div>
 
         {/* Main Grid */}
-        <div className="grid grid-cols-12 gap-6 flex-grow">
+        <div className="flex flex-col gap-6 flex-grow overflow-hidden">
 
-          {/* Left Column: Stats */}
-          <div className="col-span-4 flex flex-col gap-6">
-
-            {/* Attributes Table */}
-            <div className="border-2 border-black">
-              <div className="grid grid-cols-3 bg-black text-white text-xs font-bold p-1 text-center uppercase">
-                <div className="col-span-2 text-left px-2">Attribute</div>
-                <div>Value</div>
-              </div>
-              {(Object.values(character.stats) as Stat[]).map((stat) => (
-                <div key={stat.name} className="grid grid-cols-3 border-b border-stone-300 last:border-0 text-center items-center h-10">
-                  <div className="col-span-2 text-left px-2 font-serif font-bold text-lg uppercase tracking-wide">{stat.name}</div>
-                  <div className="font-bold text-lg border-l border-stone-300">{stat.value}</div>
+          <div className="grid grid-cols-12 gap-6 shrink-0">
+            {/* Left Column: Stats */}
+            <div className="col-span-4 flex flex-col gap-4">
+              {/* Attributes Table */}
+              <div className="border-2 border-black">
+                <div className="grid grid-cols-3 bg-black text-white text-[10px] font-bold p-1 text-center uppercase">
+                  <div className="col-span-2 text-left px-2">Attribute</div>
+                  <div>Value</div>
                 </div>
-              ))}
-            </div>
-
-            {/* Armor Class */}
-            <div className="border-2 border-black p-2 text-center">
-              <div className="uppercase text-xs font-bold tracking-widest text-stone-500 mb-1">Armor Defense</div>
-              <div className="text-5xl font-black">{totalDefense}</div>
-              <div className="text-sm italic mt-1 px-2 truncate">{armorDescription || "无甲"}</div>
-            </div>
-
-            {/* Hit Points */}
-            <div className="border-2 border-black p-2 text-center">
-              <div className="flex justify-between text-xs font-bold uppercase border-b border-black pb-1 mb-2">
-                <span>Max HP</span>
-                <span>Current</span>
+                {(Object.values(character.stats) as Stat[]).map((stat) => (
+                  <div key={stat.name} className="grid grid-cols-3 border-b border-stone-300 last:border-0 text-center items-center h-8">
+                    <div className="col-span-2 text-left px-1 font-serif font-bold text-base uppercase tracking-tight">{stat.name}</div>
+                    <div className="font-bold text-base border-l border-stone-300">{stat.value}</div>
+                  </div>
+                ))}
               </div>
-              <div className="flex justify-between items-baseline px-4">
-                <span className="text-3xl font-bold text-stone-400">{character.hp.max}</span>
-                <span className="text-5xl font-black">{character.hp.current}</span>
+
+              {/* Armor & HP Row */}
+              <div className="grid grid-cols-2 gap-2">
+                <div className="border-2 border-black p-1 text-center">
+                  <div className="uppercase text-[8px] font-bold tracking-tighter text-stone-500">Armor</div>
+                  <div className="text-3xl font-black leading-none">{totalDefense}</div>
+                </div>
+                <div className="border-2 border-black p-1 text-center">
+                  <div className="uppercase text-[8px] font-bold tracking-tighter text-stone-500">HP</div>
+                  <div className="text-3xl font-black leading-none">{character.hp.current}</div>
+                </div>
               </div>
             </div>
 
-            {/* Traits List */}
-            <div className="border-2 border-black p-4 text-sm font-serif flex-grow">
-              <h3 className="font-bold uppercase border-b border-black mb-2">Traits</h3>
-              <ul className="space-y-1">
+            {/* Right Column: Traits */}
+            <div className="col-span-8 border-2 border-black p-3 relative bg-stone-50/30">
+              <h3 className="font-bold uppercase text-xs border-b-2 border-black mb-2 inline-block">Character Description</h3>
+              <div className="grid grid-cols-2 gap-x-4 gap-y-1">
                 {Object.entries(character.traits).map(([key, value]) => (
-                  <li key={key} className="flex justify-between">
-                    <span className="capitalize text-stone-500 text-xs">{key}:</span>
-                    <span className="font-bold">{value}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-
-          </div>
-
-          {/* Right Column: Inventory */}
-          <div className="col-span-8 flex flex-col h-full">
-            <div className="border-2 border-black h-full flex flex-col">
-              <div className="bg-black text-white font-bold p-2 uppercase flex justify-between items-center shrink-0">
-                <span>Inventory Slots</span>
-                <span className="text-xs font-normal opacity-75">Max: {maxSlots}</span>
-              </div>
-
-              {/* Inventory Rows */}
-              <div className="flex flex-col flex-grow">
-                {character.inventory.map((item, idx) => (
-                  <div key={item.id} className="flex border-b border-stone-400 min-h-[40px] items-center px-2 py-1">
-                    <div className="w-8 font-mono text-stone-400 text-xs flex-shrink-0">{idx + 1}.</div>
-                    <div className="flex-grow font-serif text-lg leading-tight">
-                      {item.name}
-                      {/* Show Stats inline for sheet */}
-                      <span className="text-sm text-stone-500 ml-2">
-                        {item.type === 'weapon' && item.damage && `(${item.damage})`}
-                        {item.type === 'armor' && item.defense && item.defense >= 10 && `(AC ${item.defense})`}
-                        {item.type === 'armor' && item.defense && item.defense < 10 && `(+${item.defense} AC)`}
-                      </span>
-                    </div>
-                    {item.quality !== undefined && (
-                      <div className="w-16 text-center text-xs text-stone-500 border-l border-r border-stone-200 mx-2">
-                        耐久: {item.quality}
-                      </div>
-                    )}
-                    <div className="w-12 text-center text-xs flex-shrink-0">
-                      {item.slots > 1 ? `${item.slots} slots` : ''}
-                    </div>
-                  </div>
-                ))}
-                {/* Empty Rows */}
-                {Array.from({ length: emptySlots }).map((_, idx) => (
-                  <div key={`empty-${idx}`} className="flex border-b border-stone-400 h-10 items-center px-2 opacity-50 last:border-b-0">
-                    <div className="w-8 font-mono text-stone-300 text-xs">{character.inventory.length + idx + 1}.</div>
-                    <div className="flex-grow border-b border-stone-200 border-dotted h-6"></div>
+                  <div key={key} className="flex items-baseline gap-2 border-b border-stone-200 pb-0.5">
+                    <span className="capitalize text-stone-400 text-[9px] font-bold uppercase min-w-[60px]">{key}:</span>
+                    <span className="font-serif text-sm font-bold truncate">{value || '---'}</span>
                   </div>
                 ))}
               </div>
+              <div className="absolute top-2 right-3 text-[8px] text-stone-300 font-mono">ID: {Math.random().toString(36).substr(2, 9).toUpperCase()}</div>
             </div>
           </div>
 
+          {/* Bottom Section: Inventory - Full Width */}
+          <div className="border-2 border-black flex flex-col flex-grow min-h-0">
+            <div className="bg-black text-white font-bold px-3 py-1.5 uppercase flex justify-between items-center">
+              <div className="flex items-center gap-4">
+                <span className="text-lg tracking-widest">Inventory Slots</span>
+                <span className="text-[10px] font-normal opacity-60">物品栏位</span>
+              </div>
+              <span className="text-xs font-mono">Encumbrance: {character.inventory.reduce((s, i) => s + (i.slots || 0), 0)} / {maxSlots}</span>
+            </div>
+
+            <div className="grid grid-cols-2 flex-grow overflow-hidden">
+              {/* Left Inventory Column */}
+              <div className="border-r border-black flex flex-col">
+                {Array.from({ length: Math.ceil(maxSlots / 2) }).map((_, idx) => {
+                  const item = character.inventory[idx];
+                  return (
+                    <div key={`inv-l-${idx}`} className="flex border-b border-stone-300 h-9 items-center px-3 relative group">
+                      <div className="w-6 font-mono text-stone-300 text-[10px] flex-shrink-0">{idx + 1}</div>
+                      {item ? (
+                        <div className="flex flex-grow items-center justify-between min-w-0">
+                          <div className="flex-grow font-serif text-base leading-tight truncate pr-2">
+                            <span className="font-bold">{item.name}</span>
+                            <span className="text-[10px] text-stone-400 ml-2 italic">
+                              {item.type === 'weapon' && item.damage && `${item.damage}`}
+                              {item.type === 'armor' && item.defense && `+${item.defense}AP`}
+                            </span>
+                          </div>
+                          {item.quality !== undefined && item.quality > 0 && (
+                            <div className="flex items-center gap-1 shrink-0 bg-stone-100 px-1.5 py-0.5 rounded border border-stone-200">
+                              <span className="text-[8px] font-bold text-stone-400 uppercase">Dur:</span>
+                              <span className="text-[10px] font-black">{item.quality}</span>
+                            </div>
+                          )}
+                        </div>
+                      ) : (
+                        <div className="flex-grow border-b border-stone-100 border-dotted h-4 opacity-50"></div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+
+              {/* Right Inventory Column */}
+              <div className="flex flex-col">
+                {Array.from({ length: Math.ceil(maxSlots / 2) }).map((_, idx) => {
+                  const realIdx = idx + Math.ceil(maxSlots / 2);
+                  const item = character.inventory[realIdx];
+                  if (realIdx >= maxSlots) return null;
+                  return (
+                    <div key={`inv-r-${idx}`} className="flex border-b border-stone-300 h-9 items-center px-3 relative">
+                      <div className="w-6 font-mono text-stone-300 text-[10px] flex-shrink-0">{realIdx + 1}</div>
+                      {item ? (
+                        <div className="flex flex-grow items-center justify-between min-w-0">
+                          <div className="flex-grow font-serif text-base leading-tight truncate pr-2">
+                            <span className="font-bold">{item.name}</span>
+                            <span className="text-[10px] text-stone-400 ml-2 italic">
+                              {item.type === 'weapon' && item.damage && `${item.damage}`}
+                              {item.type === 'armor' && item.defense && `+${item.defense}AP`}
+                            </span>
+                          </div>
+                          {item.quality !== undefined && item.quality > 0 && (
+                            <div className="flex items-center gap-1 shrink-0 bg-stone-100 px-1.5 py-0.5 rounded border border-stone-200">
+                              <span className="text-[8px] font-bold text-stone-400 uppercase">Dur:</span>
+                              <span className="text-[10px] font-black">{item.quality}</span>
+                            </div>
+                          )}
+                        </div>
+                      ) : (
+                        <div className="flex-grow border-b border-stone-100 border-dotted h-4 opacity-50"></div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
         </div>
 
         <div className="mt-auto pt-6 text-xs text-center text-stone-400 font-serif shrink-0 space-y-1">
