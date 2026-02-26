@@ -39,6 +39,7 @@ export interface Traits {
 }
 
 export interface Character {
+  id: string;
   name: string;
   level: number;
   xp: number;
@@ -50,6 +51,7 @@ export interface Character {
   traits: Traits;
   inventory: Item[];
   memo?: string;
+  isDead?: boolean;
 }
 
 export interface CustomSpell {

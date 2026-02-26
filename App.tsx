@@ -58,6 +58,7 @@ const generateInitialCharacter = (): Character => {
   const hpVal = d6();
 
   return {
+    id: crypto.randomUUID(),
     name: '',
     level: 1,
     xp: 0,
@@ -69,33 +70,56 @@ const generateInitialCharacter = (): Character => {
     },
     inventory: [],
     memo: '',
+    isDead: false,
   };
 };
 
-const LOCAL_STORAGE_KEY = 'knave_character_data';
+const LOCAL_STORAGE_KEY_LIST = 'knave_characters_list';
+const LOCAL_STORAGE_KEY_LEGACY = 'knave_character_data';
 
 const App: React.FC = () => {
-  const [character, setCharacter] = useState<Character>(() => {
+  const [characters, setCharacters] = useState<Character[]>(() => {
     try {
-      const saved = localStorage.getItem(LOCAL_STORAGE_KEY);
-      if (saved) {
-        return JSON.parse(saved);
+      const savedList = localStorage.getItem(LOCAL_STORAGE_KEY_LIST);
+      if (savedList) {
+        return JSON.parse(savedList);
+      }
+      const legacySaved = localStorage.getItem(LOCAL_STORAGE_KEY_LEGACY);
+      if (legacySaved) {
+        const char = JSON.parse(legacySaved);
+        if (!char.id) char.id = crypto.randomUUID();
+        return [char];
       }
     } catch (e) {
-      console.error("Failed to load character from storage", e);
+      console.error("Failed to load characters from storage", e);
     }
-    return generateInitialCharacter();
+    return [generateInitialCharacter()];
   });
+  const [activeCharId, setActiveCharId] = useState<string>(characters[0]?.id || '');
   const [viewMode, setViewMode] = useState<'edit' | 'sheet' | 'rules' | 'tables' | 'memo'>('edit');
+
+  const character = characters.find(c => c.id === activeCharId) || characters[0] || generateInitialCharacter();
+
+  const setCharacter = useCallback((updater: React.SetStateAction<Character>) => {
+    setCharacters(prev => {
+      const idx = prev.findIndex(c => c.id === activeCharId);
+      if (idx === -1) return prev;
+      const current = prev[idx];
+      const next = typeof updater === 'function' ? updater(current) : updater;
+      const newList = [...prev];
+      newList[idx] = next;
+      return newList;
+    });
+  }, [activeCharId]);
 
   // Persistence
   useEffect(() => {
     try {
-      localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(character));
+      localStorage.setItem(LOCAL_STORAGE_KEY_LIST, JSON.stringify(characters));
     } catch (e) {
-      console.error("Failed to save character to storage", e);
+      console.error("Failed to save characters to storage", e);
     }
-  }, [character]);
+  }, [characters]);
 
   // Actions
   const rerollStats = useCallback(() => {
@@ -176,7 +200,19 @@ const App: React.FC = () => {
 
     // Weapon or Armor
     if (Math.random() > 0.5) {
-      newInventory.push(createItem("自选近战武器", 1, 'weapon', { damage: 'd6', quality: 3 }));
+      const weapons = [
+        { name: "匕首", damage: 'd6', slots: 1 },
+        { name: "棍棒", damage: 'd6', slots: 1 },
+        { name: "镰刀", damage: 'd6', slots: 1 },
+        { name: "杖", damage: 'd6', slots: 1 },
+        { name: "矛", damage: 'd8', slots: 2 },
+        { name: "剑", damage: 'd8', slots: 2 },
+        { name: "硬头锤", damage: 'd8', slots: 2 },
+        { name: "斧", damage: 'd8', slots: 2 },
+        { name: "连枷", damage: 'd8', slots: 2 },
+      ];
+      const w = pick(weapons);
+      newInventory.push(createItem(w.name, w.slots, 'weapon', { damage: w.damage, quality: 3 }));
     } else {
       const armors = ["盾牌", "头盔", "布面甲", "锁子甲衫", "胸甲", "臂甲", "腿甲"];
       newInventory.push(createItem(pick(armors), 1, 'armor', { defense: 1, quality: 1 }));
@@ -336,86 +372,146 @@ const App: React.FC = () => {
         )}
 
         {viewMode === 'edit' && (
-          <main className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <main className="flex flex-col gap-6">
 
-            {/* Column 1: Stats & Vitals */}
-            <div className="space-y-6">
-              <div className="bg-white p-4 rounded-sm shadow-md border-2 border-stone-800 space-y-4">
-                <div>
-                  <label className="block text-sm font-bold text-stone-500 uppercase mb-1">角色姓名 (Name)</label>
-                  <input
-                    type="text"
-                    value={character.name}
-                    onChange={(e) => setCharacter(prev => ({ ...prev, name: e.target.value }))}
-                    className="w-full text-2xl font-serif font-bold border-b-2 border-stone-300 focus:border-stone-800 focus:outline-none bg-transparent"
-                    placeholder="无名恶棍..."
-                  />
-                </div>
+            {/* Character Manager UI */}
+            <div className="bg-stone-100 p-3 rounded-sm border border-stone-300 flex flex-wrap items-center gap-4">
+              <label className="font-bold text-sm text-stone-600 uppercase">当前角色</label>
+              <select
+                value={activeCharId}
+                onChange={(e) => setActiveCharId(e.target.value)}
+                className="border-b-2 border-stone-300 bg-transparent px-2 py-1 font-serif font-bold text-stone-800 focus:outline-none focus:border-stone-800 flex-grow text-lg"
+              >
+                {characters.map(c => (
+                  <option key={c.id} value={c.id}>
+                    {c.name || '无名氏'} [Lv {c.level}] {c.isDead ? '(撕卡)' : ''}
+                  </option>
+                ))}
+              </select>
 
-                {/* Regenerate Button */}
+              <div className="flex flex-wrap gap-2 w-full sm:w-auto mt-2 sm:mt-0">
                 <button
                   onClick={() => {
-                    rerollStats();
-                    rerollHp();
-                    randomizeTraits();
-                    generateStartingGear();
+                    const newChar = generateInitialCharacter();
+                    setCharacters(prev => [...prev, newChar]);
+                    setActiveCharId(newChar.id);
                   }}
-                  className="w-full bg-stone-800 text-white py-2 rounded-sm shadow hover:bg-stone-700 transition-all text-sm font-bold flex items-center justify-center gap-2"
+                  className="bg-stone-800 text-white px-3 py-1.5 rounded-sm text-xs border border-stone-900 shadow-sm hover:bg-stone-700 hover:shadow font-bold transition-all flex-grow sm:flex-grow-0"
                 >
-                  <Dices size={16} />
-                  重新生成所有属性与装备
+                  新建角色
                 </button>
-
-                <div className="grid grid-cols-2 gap-4 pt-2 border-t border-stone-200">
-                  <div>
-                    <label className="block text-xs font-bold text-stone-500 uppercase mb-1">经验值 (XP)</label>
-                    <input
-                      type="number"
-                      value={character.xp}
-                      onChange={handleXpChange}
-                      className="w-full font-mono font-bold text-lg border border-stone-300 rounded px-2 py-1 focus:border-stone-800 focus:outline-none"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-xs font-bold text-stone-500 uppercase mb-1">等级 (Level)</label>
-                    <input
-                      type="number"
-                      value={character.level}
-                      onChange={handleLevelChange}
-                      className="w-full font-serif font-bold text-xl text-stone-800 border-b border-stone-300 py-1 focus:border-stone-800 focus:outline-none bg-transparent"
-                    />
-                  </div>
-                </div>
+                <button
+                  onClick={() => {
+                    if (window.confirm(`确认将角色 ${character.name || '无名氏'} 标记为撕卡(死亡)状态吗？`)) {
+                      setCharacter(prev => ({ ...prev, isDead: !prev.isDead }));
+                    }
+                  }}
+                  className={`px-3 py-1.5 rounded-sm text-xs shadow-sm font-bold transition-all flex-grow sm:flex-grow-0 border ${character.isDead ? 'bg-amber-100 text-amber-800 border-amber-300 hover:bg-amber-200' : 'bg-red-50 text-red-800 border-red-200 hover:bg-red-100'}`}
+                >
+                  {character.isDead ? '撤销撕卡' : '标记撕卡'}
+                </button>
+                <button
+                  onClick={() => {
+                    if (characters.length === 1) {
+                      alert('至少保留一个角色。可以清空姓名和属性代替删除。');
+                      return;
+                    }
+                    if (window.confirm(`确定要彻底删除角色 ${character.name || '无名氏'} 吗？此操作无法恢复！`)) {
+                      setCharacters(prev => {
+                        const nextList = prev.filter(c => c.id !== activeCharId);
+                        setActiveCharId(nextList[0].id);
+                        return nextList;
+                      });
+                    }
+                  }}
+                  className="bg-stone-200 text-stone-600 border border-stone-300 px-3 py-1.5 rounded-sm text-xs hover:bg-stone-300 shadow-sm font-bold transition-all flex-grow sm:flex-grow-0"
+                >
+                  删除
+                </button>
               </div>
+            </div>
 
-              <StatBlock stats={character.stats} onRerollAll={rerollStats} onAdjustStat={adjustStat} />
+            <div className={`grid grid-cols-1 lg:grid-cols-2 gap-6 ${character.isDead ? 'opacity-70 grayscale' : ''}`}>
+              {/* Column 1: Stats & Vitals */}
+              <div className="space-y-6">
+                <div className="bg-white p-4 rounded-sm shadow-md border-2 border-stone-800 space-y-4">
+                  <div>
+                    <label className="block text-sm font-bold text-stone-500 uppercase mb-1">角色姓名 (Name)</label>
+                    <input
+                      type="text"
+                      value={character.name}
+                      onChange={(e) => setCharacter(prev => ({ ...prev, name: e.target.value }))}
+                      className="w-full text-2xl font-serif font-bold border-b-2 border-stone-300 focus:border-stone-800 focus:outline-none bg-transparent"
+                      placeholder="无名恶棍..."
+                    />
+                  </div>
 
-              <div className="bg-white p-4 rounded-sm shadow-md border-2 border-stone-800 flex justify-between items-center">
-                <div>
-                  <h3 className="text-lg font-bold font-serif">生命值 (HP)</h3>
-                  <div className="text-sm text-stone-500">Max HP ({character.level}d6)</div>
-                </div>
-                <div className="flex items-center gap-2">
-                  <input
-                    type="number"
-                    value={character.hp.max}
-                    onChange={handleMaxHpChange}
-                    className="w-24 text-4xl font-black text-red-800 text-right border-b-2 border-stone-200 focus:border-red-800 focus:outline-none bg-transparent"
-                  />
-                  <button onClick={rerollHp} className="bg-stone-200 p-2 rounded-full hover:bg-stone-300" title={`重投生命值 (当前等级 ${character.level})`}>
-                    <RefreshCw size={16} />
+                  {/* Regenerate Button */}
+                  <button
+                    onClick={() => {
+                      rerollStats();
+                      rerollHp();
+                      randomizeTraits();
+                      generateStartingGear();
+                    }}
+                    className="w-full bg-stone-800 text-white py-2 rounded-sm shadow hover:bg-stone-700 transition-all text-sm font-bold flex items-center justify-center gap-2"
+                  >
+                    <Dices size={16} />
+                    重新生成所有属性与装备
                   </button>
+
+                  <div className="grid grid-cols-2 gap-4 pt-2 border-t border-stone-200">
+                    <div>
+                      <label className="block text-xs font-bold text-stone-500 uppercase mb-1">经验值 (XP)</label>
+                      <input
+                        type="number"
+                        value={character.xp}
+                        onChange={handleXpChange}
+                        className="w-full font-mono font-bold text-lg border border-stone-300 rounded px-2 py-1 focus:border-stone-800 focus:outline-none"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-bold text-stone-500 uppercase mb-1">等级 (Level)</label>
+                      <input
+                        type="number"
+                        value={character.level}
+                        onChange={handleLevelChange}
+                        className="w-full font-serif font-bold text-xl text-stone-800 border-b border-stone-300 py-1 focus:border-stone-800 focus:outline-none bg-transparent"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <StatBlock stats={character.stats} onRerollAll={rerollStats} onAdjustStat={adjustStat} />
+
+                <div className="bg-white p-4 rounded-sm shadow-md border-2 border-stone-800 flex justify-between items-center">
+                  <div>
+                    <h3 className="text-lg font-bold font-serif">生命值 (HP)</h3>
+                    <div className="text-sm text-stone-500">Max HP ({character.level}d6)</div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="number"
+                      value={character.hp.max}
+                      onChange={handleMaxHpChange}
+                      className="w-24 text-4xl font-black text-red-800 text-right border-b-2 border-stone-200 focus:border-red-800 focus:outline-none bg-transparent"
+                    />
+                    <button onClick={rerollHp} className="bg-stone-200 p-2 rounded-full hover:bg-stone-300" title={`重投生命值 (当前等级 ${character.level})`}>
+                      <RefreshCw size={16} />
+                    </button>
+                  </div>
                 </div>
               </div>
-            </div>
 
-            {/* Column 2: Traits */}
-            <div>
-              <TraitBlock traits={character.traits} onRandomize={randomizeTraits} />
-            </div>
+              {/* Column 2: Traits */}
+              <div className="h-full">
+                <TraitBlock traits={character.traits} onRandomize={randomizeTraits} />
+              </div>
 
-            {/* Column 3: Inventory */}
-            <div>
+            </div> {/* End of Top Grid */}
+
+            {/* Bottom Half: Inventory */}
+            <div className="w-full mt-2">
               <InventoryBlock
                 inventory={character.inventory}
                 maxSlots={10 + character.stats[StatName.Constitution].value}

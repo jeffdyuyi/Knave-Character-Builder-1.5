@@ -1,7 +1,7 @@
 import React, { useRef, useCallback } from 'react';
 import { Character, StatName, Stat } from '../types';
 import { toPng } from 'html-to-image';
-import { Download, ArrowLeft, Loader2 } from 'lucide-react';
+import { Download, ArrowLeft, Loader2, FileText } from 'lucide-react';
 
 interface CharacterSheetProps {
   character: Character;
@@ -51,29 +51,87 @@ const CharacterSheet: React.FC<CharacterSheetProps> = ({ character, onEdit }) =>
     }
   }, [character.name]);
 
+  const handleDownloadTxt = useCallback(() => {
+    let txt = `==== KNAVE 角色卡 ====\n`;
+    txt += `姓名: ${character.name || '无名氏'}\n`;
+    txt += `等级: ${character.level} | 经验值: ${character.xp}/1000\n`;
+    txt += `生命值 (HP): ${character.hp.current} / ${character.hp.max}\n`;
+    txt += `护甲 (AC): ${totalDefense}\n\n`;
+
+    txt += `[属性]\n`;
+    (Object.values(character.stats) as Stat[]).forEach(stat => {
+      txt += `${stat.name}: ${stat.value}\n`;
+    });
+    txt += `\n`;
+
+    txt += `[特征]\n`;
+    Object.entries(character.traits).forEach(([k, v]) => {
+      txt += `${k.toUpperCase()}: ${v || '---'}\n`;
+    });
+    txt += `\n`;
+
+    txt += `[物品栏 (${character.inventory.reduce((s, i) => s + (i.slots || 0), 0)}/${maxSlots} 栏位)]\n`;
+    character.inventory.forEach((i, idx) => {
+      txt += `${idx + 1}. ${i.name}`;
+      if (i.slots !== 1) txt += ` (${i.slots}栏位)`;
+      if (i.type === 'weapon' && i.damage) txt += ` [伤害:${i.damage}]`;
+      if (i.type === 'armor' && i.defense) txt += ` [防御:+${i.defense}]`;
+      if (i.quality !== undefined && i.quality > 0) txt += ` (耐久:${i.quality})`;
+      txt += `\n`;
+    });
+
+    if (character.memo) {
+      txt += `\n[个人备忘]\n${character.memo}\n`;
+    }
+
+    const blob = new Blob([txt], { type: 'text/plain;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `${character.name || 'Knave_Character'}_Sheet.txt`;
+    link.click();
+    URL.revokeObjectURL(url);
+  }, [character, totalDefense, maxSlots]);
+
   return (
     <div className="max-w-[210mm] mx-auto">
       {/* Controls - No Print / No Capture */}
-      <div className="no-print mb-6 flex justify-between items-center bg-stone-200 p-4 rounded-sm border border-stone-300 shadow-sm">
+      <div className="no-print mb-6 flex justify-between items-center bg-stone-200 p-4 rounded-sm border border-stone-300 shadow-sm flex-wrap gap-4">
         <button
           onClick={onEdit}
-          className="flex items-center gap-2 text-stone-700 hover:text-stone-900 font-bold transition-colors"
+          className="flex items-center gap-2 text-stone-700 hover:text-stone-900 font-bold transition-colors shrink-0"
         >
           <ArrowLeft size={20} />
           返回编辑 (Back)
         </button>
-        <button
-          onClick={handleDownloadPng}
-          disabled={isGenerating}
-          className="flex items-center gap-2 bg-stone-800 text-white px-6 py-2 rounded shadow hover:bg-stone-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-          {isGenerating ? <Loader2 className="animate-spin" size={20} /> : <Download size={20} />}
-          {isGenerating ? '生成中...' : '保存为图片 (Save as PNG)'}
-        </button>
+        <div className="flex gap-2 w-full sm:w-auto">
+          <button
+            onClick={handleDownloadTxt}
+            className="flex items-center justify-center gap-2 bg-stone-100 text-stone-800 border border-stone-300 px-4 py-2 rounded shadow hover:bg-stone-50 transition-all font-bold flex-grow sm:flex-grow-0"
+          >
+            <FileText size={20} />
+            保存为TXT
+          </button>
+          <button
+            onClick={handleDownloadPng}
+            disabled={isGenerating}
+            className="flex items-center justify-center gap-2 bg-stone-800 text-white px-4 py-2 rounded shadow hover:bg-stone-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed font-bold flex-grow sm:flex-grow-0"
+          >
+            {isGenerating ? <Loader2 className="animate-spin" size={20} /> : <Download size={20} />}
+            {isGenerating ? '生成中...' : '保存为PNG'}
+          </button>
+        </div>
       </div>
 
       {/* The Sheet - Capture Target */}
-      <div ref={sheetRef} className="bg-white p-8 shadow-2xl print:shadow-none print:p-0 text-black aspect-[210/297] flex flex-col">
+      <div ref={sheetRef} className="bg-white p-8 shadow-2xl print:shadow-none print:p-0 text-black aspect-[210/297] flex flex-col relative overflow-hidden">
+        {character.isDead && (
+          <div className="absolute inset-0 z-50 pointer-events-none flex items-center justify-center overflow-hidden">
+            <div className="text-red-700/20 font-black text-[120px] md:text-[180px] -rotate-45 uppercase border-[12px] md:border-[16px] border-red-700/20 px-8 py-4 tracking-widest pointer-events-none">
+              DECEASED
+            </div>
+          </div>
+        )}
         {/* Header */}
         <div className="flex justify-between items-end border-b-4 border-black mb-6 pb-2 shrink-0">
           <div>
