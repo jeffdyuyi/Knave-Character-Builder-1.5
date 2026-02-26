@@ -1,5 +1,5 @@
 import React from 'react';
-import { ShieldAlert, Swords, HeartPulse, Scale, Dices, User, Users, ArrowUpCircle, Backpack, Skull, Sparkles, Book, Star, Package, Wand2, FlaskConical, Leaf } from 'lucide-react';
+import { ShieldAlert, Swords, HeartPulse, Scale, Dices, User, Users, ArrowUpCircle, Backpack, Skull, Sparkles, Book, Star, Package, Wand2, FlaskConical, Leaf, Map, Compass } from 'lucide-react';
 
 const GameRulesBlock: React.FC = () => {
   return (
@@ -32,50 +32,125 @@ const GameRulesBlock: React.FC = () => {
         </section>
 
         {/* 2. 检定 (Checks) */}
-        <section className="mb-8 bg-white p-6 rounded border border-stone-200 shadow-sm">
-          <div className="flex items-center gap-2 border-b border-stone-300 pb-2 mb-4">
-            <Scale className="text-amber-700" size={20} />
-            <h3 className="text-xl font-bold">检定 (Checks)</h3>
+        <section className="mb-8">
+          <div className="flex items-center gap-2 border-b-2 border-stone-800 pb-2 mb-4">
+            <Scale className="text-stone-900" size={24} />
+            <h3 className="text-2xl font-bold">检定 (Checks)</h3>
           </div>
-          <div className="space-y-4 text-sm leading-relaxed">
-            <p>
-              若某角色试图做出结果不确定且失败有后果的事情，需要进行一次<span className="font-bold text-stone-900">检定</span>。
-            </p>
-            <div className="p-3 bg-stone-100 border border-stone-300 rounded text-center font-bold text-lg font-mono">
-              检定得数 = 1d20 + 能力值 + 修正 &ge; 11 + 任务难度(通常为5)
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+
+            {/* 基础检定 */}
+            <div className="bg-white border border-stone-200 rounded p-4 col-span-1 lg:col-span-2">
+              <p className="text-sm leading-relaxed text-stone-700 mb-3">
+                当一个生物尝试<span className="font-bold">有风险的行动</span>时，他们通过掷一个 d20 并加上其某项能力值来进行检定。如果其总值达到或超过游戏主持人设定的<span className="font-bold">目标数字</span>，则成功。如果一个生物没有能力值，游戏主持人可以根据其在该任务上的表现，使用其<span className="font-bold">等级、等级的一半或零</span>作为替代。游戏主持人不应为那些可以通过批判性思维解决的情境要求进行检定。除非玩家角色拥有合适的工具或职业，否则某些行动可能无法完成。
+              </p>
+              <div className="p-2 bg-stone-100 border border-stone-300 rounded text-center text-xs font-mono font-bold">
+                1d20 + 能力值 + 修正 ≥ 目标数字（11 + 难度，默认难度为 5）
+              </div>
             </div>
 
-            <div className="mt-4">
-              <strong className="block text-base mb-1">对抗检定 (Opposed Checks)</strong>
-              <p>对抗的能力值和护甲点数可以作为任务难度。如果生物没有能力值，则替代为其等级、一半等级或0（由裁判决定）。</p>
+            {/* 设定目标数字 */}
+            <div className="bg-stone-50 border border-stone-200 rounded p-4">
+              <h4 className="font-bold text-base mb-2">设定目标数字</h4>
+              <p className="text-sm leading-relaxed text-stone-700">
+                以 <span className="font-bold">11</span> 为基础，然后加上一个从 <span className="font-bold">0 到 10</span> 的难度等级（默认为 <span className="font-bold">5</span>）。如果检定是针对另一个生物，则难度等级等于其相关能力值或等级。在攻击中，难度是防御者的护甲点数（<span className="font-bold font-mono">11 + AP</span> 的目标数字被称为护甲等级）。
+              </p>
             </div>
 
-            <div className="mt-4">
-              <strong className="block text-base mb-1">优势与劣势</strong>
-              <p>来自优势、劣势或职业的修正在投骰中体现为<span className="font-bold text-amber-700">&plusmn;5 增量</span>，不再是投2d20取高低。</p>
+            {/* 反向检定 */}
+            <div className="bg-stone-50 border border-stone-200 rounded p-4">
+              <h4 className="font-bold text-base mb-2">反向检定 (Inverse Checks)</h4>
+              <p className="text-sm leading-relaxed text-stone-700">
+                通过反转游戏主持人通常进行的检定，可以让玩家进行所有掷骰。例如：一个哥布林试图攻击玩家角色时，可以将其等级加到 d20 上，尝试达到玩家角色的护甲等级（<span className="font-mono font-bold">11 + 玩家角色的护甲点数</span>）。反向掷骰时，玩家角色可以将其护甲点数加到 d20 上，目标是达到 <span className="font-mono font-bold">11 + 哥布林等级</span> 的目标数字。
+              </p>
             </div>
 
-            <div className="mt-4 p-3 bg-blue-50/50 border border-blue-200 rounded">
-              <strong className="block text-base mb-1 text-blue-900">角色知识 (Character Knowledge)</strong>
-              <p className="text-blue-800">不要进行所谓的“知识检定”。玩家角色知道所有常识和与职业相关的知识。所有其他知识必须被寻找。</p>
+            {/* 修正值 */}
+            <div className="bg-amber-50 border border-amber-200 rounded p-4">
+              <h4 className="font-bold text-base mb-2 text-amber-900">修正值 (Modifiers)</h4>
+              <p className="text-sm leading-relaxed text-stone-700">
+                游戏主持人可以对掷骰玩家在检定中拥有的每个<span className="font-bold text-red-700">劣势施加 -5 罚值</span>，对每个<span className="font-bold text-amber-700">优势施加 +5 加值</span>。（例如，相关的职业、巧妙的方法、额外的时间、正确的工具等）。
+              </p>
             </div>
+
+            {/* 社交检定 */}
+            <div className="bg-blue-50 border border-blue-200 rounded p-4">
+              <h4 className="font-bold text-base mb-2 text-blue-900">社交检定 (Social Checks)</h4>
+              <p className="text-sm leading-relaxed text-stone-700">
+                在大多数情况下，社交互动的结果可以通过常识和角色扮演来解决，但在有风险的情况下，游戏主持人可能会要求进行检定。这些检定使用玩家角色的<span className="font-bold">魅力值</span>对抗非玩家角色的<span className="font-bold">感知值或魅力值</span>，具体取决于情境。可以根据目标的性格、与玩家角色的关系、阵营或道德立场、玩家角色的措辞、贿赂、威胁等因素施加修正值。
+              </p>
+            </div>
+
+            {/* 知识 & 搜索检定 */}
+            <div className="bg-white border border-stone-200 rounded p-4 space-y-3 col-span-1 lg:col-span-2">
+              <div>
+                <h4 className="font-bold text-base mb-1">知识检定 (Knowledge)</h4>
+                <p className="text-sm leading-relaxed text-stone-700">
+                  玩家角色回忆知识时<span className="font-bold">无需进行检定</span>。玩家角色自动知晓所有<span className="font-bold">常识</span>以及其<span className="font-bold">职业所涵盖的任何专业知识</span>。任何其他知识都必须在游戏中发现。
+                </p>
+              </div>
+              <div className="border-t border-stone-100 pt-3">
+                <h4 className="font-bold text-base mb-1">搜索检定 (Search)</h4>
+                <p className="text-sm leading-relaxed text-stone-700">
+                  隐藏的事物要么在花费足够时间搜索后<span className="font-bold">自动发现</span>（通常地下城房间为<span className="font-bold">十分钟</span>，荒野六角格为<span className="font-bold">一整个值夜班次</span>），要么必须通过游戏内行动才能找到。区域的<span className="font-bold">明显特征</span>应立即向玩家角色描述，<span className="font-bold">细节</span>则应在玩家提问和调查时进行描述。
+                </p>
+              </div>
+            </div>
+
           </div>
         </section>
 
-        {/* 3. 物品栏位 (Item Slots) */}
+        {/* 占位：以下原内容继续 */}
+
+        {/* 3. 栏位、伤害与死亡 */}
         <section className="mb-8">
-          <div className="flex items-center gap-2 border-b border-stone-300 pb-2 mb-4">
-            <Backpack className="text-amber-700" size={20} />
-            <h3 className="text-xl font-bold">物品栏位 (Item Slots)</h3>
+          <div className="flex items-center gap-2 border-b-2 border-stone-800 pb-2 mb-4">
+            <Backpack className="text-stone-900" size={24} />
+            <h3 className="text-2xl font-bold">栏位、伤害与死亡</h3>
           </div>
-          <div className="bg-amber-50/50 p-4 rounded text-sm space-y-2 border border-amber-100">
-            <p>PC 拥有<span className="font-bold"> 10 + 体质 </span>数值的物品栏位。</p>
-            <ul className="list-disc list-inside space-y-1 text-stone-700">
-              <li>多数物品（魔典、药水、单日口粮、轻型武器、工具等）占用 1 栏位。</li>
-              <li>格外沉重硕大的物品（护甲、中型至重型武器）会占用更多栏位。</li>
-              <li>一组小型同类物品可叠放在同一栏位里。100枚硬币可存进1栏位。</li>
-              <li>一般而言，1栏位可承受5磅重量。</li>
-            </ul>
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+
+            {/* 栏位 */}
+            <div className="bg-amber-50 border border-amber-200 rounded p-4">
+              <h4 className="font-bold text-base mb-2 text-amber-900">栏位 (Item Slots)</h4>
+              <p className="text-sm leading-relaxed text-stone-700 mb-2">
+                玩家角色拥有 <span className="font-bold">10 + 体质值</span> 的物品栏位来记录他们的装备。
+              </p>
+              <ul className="text-sm space-y-1.5 text-stone-700">
+                <li>大多数物品，包括那些能单手握持的小件物品组合，占据 <span className="font-bold">1 个栏位</span>。</li>
+                <li>双手物品占据 <span className="font-bold">2 个栏位</span>。</li>
+                <li><span className="font-bold">500 枚钱币</span>占据一个完整栏位。</li>
+              </ul>
+            </div>
+
+            {/* 伤害 */}
+            <div className="bg-white border border-stone-200 rounded p-4">
+              <h4 className="font-bold text-base mb-2">伤害 (Damage)</h4>
+              <p className="text-sm leading-relaxed text-stone-700">
+                玩家角色受到的伤害会从其<span className="font-bold">生命值（HP）</span>中扣除。一旦其生命值降至 0，每点伤害会从<span className="font-bold">最高编号的栏位</span>开始，到最低编号的栏位，用一个相应的<span className="font-bold text-red-700">创伤</span>（如刺伤、冻伤、烧伤等）填充一个物品栏位。受创伤栏位中的物品必须被丢弃。
+              </p>
+            </div>
+
+            {/* 直接伤害 */}
+            <div className="bg-red-50 border border-red-200 rounded p-4">
+              <h4 className="font-bold text-base mb-2 text-red-900">直接伤害 (Direct Damage)</h4>
+              <p className="text-sm leading-relaxed text-stone-700">
+                直接伤害会<span className="font-bold">绕过生命值（HP）</span>并直接增加创伤。这种情况发生在生物的战斗技能无法保护它们时（例如，坠落或被偷袭时）。怪物从直接伤害中受到<span className="font-bold text-red-700">三倍伤害</span>，因为它们没有物品栏位。
+              </p>
+            </div>
+
+            {/* 死亡 */}
+            <div className="bg-stone-800 border border-stone-700 rounded p-4">
+              <h4 className="font-bold text-base mb-2 text-white flex items-center gap-2">
+                <Skull size={15} className="text-red-400" /> 死亡 (Death)
+              </h4>
+              <p className="text-sm leading-relaxed text-stone-200">
+                当玩家角色的<span className="font-bold">所有物品栏位都被创伤填满</span>时，他们便会死亡。没有物品栏位的生物，如怪物，则在<span className="font-bold text-red-400">生命值降至 0</span> 时直接死亡。
+              </p>
+            </div>
+
           </div>
         </section>
 
@@ -232,34 +307,48 @@ const GameRulesBlock: React.FC = () => {
           </div>
         </section>
 
-        {/* 6. 治疗与提升 */}
-        <section className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="bg-white p-4 rounded border border-stone-200">
-            <div className="flex items-center gap-2 mb-2">
-              <HeartPulse className="text-red-700" size={20} />
-              <h3 className="font-bold text-lg">治疗 (Healing)</h3>
-            </div>
-            <ul className="text-sm space-y-2 list-disc list-inside">
-              <li><span className="font-bold">饱餐一顿和整夜休息：</span> 恢复 1d8 + 体质奖励 HP。</li>
-              <li><span className="font-bold">安全避风港休息：</span> 恢复全部 HP。</li>
-            </ul>
+        {/* 6. 治疗与升级 */}
+        <section className="mb-8">
+          <div className="flex items-center gap-2 border-b-2 border-stone-800 pb-2 mb-4">
+            <HeartPulse className="text-stone-900" size={24} />
+            <h3 className="text-2xl font-bold">治疗与升级</h3>
           </div>
 
-          <div className="bg-white p-4 rounded border border-stone-200">
-            <div className="flex items-center gap-2 mb-2">
-              <ArrowUpCircle className="text-green-700" size={20} />
-              <h3 className="font-bold text-lg">提升 (Levelling)</h3>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+
+            {/* 治疗 */}
+            <div className="bg-green-50 border border-green-200 rounded p-4">
+              <h4 className="font-bold text-base mb-2 text-green-900 flex items-center gap-2">
+                <HeartPulse size={15} /> 治疗 (Healing)
+              </h4>
+              <p className="text-sm leading-relaxed text-stone-700">
+                只要玩家角色在前一晚睡足<span className="font-bold">两个值夜班次</span>并<span className="font-bold">进食一餐</span>，其生命值（HP）就会在每个早晨<span className="font-bold text-green-700">恢复到最大值</span>。如果他们在<span className="font-bold">安全庿护所</span>，还会治愈<span className="font-bold">一处创伤</span>。
+              </p>
             </div>
-            <div className="text-sm space-y-2">
-              <p>当 PC 积累了 <span className="font-bold">1000 XP</span> 就能提升一级。</p>
-              <div className="bg-stone-50 p-2 rounded text-xs">
-                <p className="font-bold mb-1">升级效果：</p>
-                <ol className="list-decimal list-inside space-y-1">
-                  <li><span className="font-bold">HP：</span>投掷 新等级数×d6。若得数 &le; 旧HP上限，则旧HP上限+1。否则使用新得数。</li>
-                  <li><span className="font-bold">属性：</span>选择3项不同的属性，让其数值各加 1，或随机掷决定分配 (上限10)。</li>
-                </ol>
+
+            {/* 经验值 */}
+            <div className="bg-amber-50 border border-amber-200 rounded p-4">
+              <h4 className="font-bold text-base mb-2 text-amber-900 flex items-center gap-2">
+                <ArrowUpCircle size={15} /> 经验值 (XP)
+              </h4>
+              <p className="text-sm leading-relaxed text-stone-700">
+                从偏远、危险地点回收并带回文明世界的每 <span className="font-bold">1 錢币（c）</span>价值的宝藏，会为玩家角色奖励 <span className="font-bold text-amber-700">1 点经验值（XP）</span>，并在所有提供协助的玩家角色之间<span className="font-bold">平均分配</span>。
+              </p>
+              <p className="text-xs text-stone-500 mt-2 italic">如果使用其他系统的预设地下城（铜/銀/琥珀金/金/擂金币），将总价值换算成金币，并获得等量的 XP。</p>
+            </div>
+
+            {/* 升级 */}
+            <div className="bg-white border border-stone-200 rounded p-4 col-span-1 lg:col-span-2">
+              <h4 className="font-bold text-base mb-3">升级 (Level Up)</h4>
+              <p className="text-sm leading-relaxed text-stone-700 mb-3">
+                达到特定的经验值（XP）阈値时，玩家角色会提升等级，这会使其<span className="font-bold">三项不同的能力值各增加 1 点</span>。经验值（XP）<span className="font-bold">不会重置为零</span>。这三项能力值可以由玩家选择，也可以随机选择。
+              </p>
+              <div className="bg-stone-50 border border-stone-100 rounded p-3 text-sm">
+                <span className="font-bold block mb-1">HP 重掷：</span>
+                每次升级还允许玩家使用一个<span className="font-bold">额外的 d6</span> 来重掷其玩家角色的最高生命值（HP）。如果掷出的总值<span className="font-bold">不大于</span>其之前的最大值，则在其之前的最大值上<span className="font-bold text-amber-700">加 1</span>。
               </div>
             </div>
+
           </div>
         </section>
 
@@ -471,8 +560,77 @@ const GameRulesBlock: React.FC = () => {
           </div>
         </section>
 
+        {/* 9. 旅行 (Travel) */}
+        <section className="mb-8">
+          <div className="flex items-center gap-2 border-b-2 border-stone-800 pb-2 mb-4">
+            <Map className="text-stone-900" size={24} />
+            <h3 className="text-2xl font-bold">旅行 (Travel)</h3>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+
+            {/* 值夜班次 */}
+            <div className="bg-stone-50 border border-stone-200 rounded p-4 col-span-1 lg:col-span-2">
+              <h4 className="font-bold text-base mb-2">值夜班次 (Watches)</h4>
+              <p className="text-sm leading-relaxed text-stone-700">
+                旅行时，一天分为六个四小时的值夜班次：<span className="font-bold">三个白天的，三个夜晚的</span>。大多数主要行动（旅行、觅食、搜索等）需要一个值夜班次才能完成。
+              </p>
+            </div>
+
+            {/* 旅行速度 */}
+            <div className="bg-white border border-stone-200 rounded p-4">
+              <h4 className="font-bold text-base mb-2 flex items-center gap-2">
+                <Compass size={15} className="text-stone-600" /> 旅行速度 (Speed)
+              </h4>
+              <p className="text-sm leading-relaxed text-stone-700 mb-2">
+                玩家角色每个值夜班次可以移动<span className="font-bold">一个六英里六角格</span>，每天最多三次。每日第三个值夜班次之后，每继续旅行一个值夜班次，除非成功通过一次<span className="font-bold">体质检定</span>，否则每个玩家角色都会受到、<span className="font-bold text-red-700">1 点直接伤害</span>。
+              </p>
+              <div className="text-xs text-stone-500 space-y-1">
+                <div>黑暗、困难地形或恶劣天气中速度<span className="font-bold">减半</span>；骑乘时速度<span className="font-bold">加倍</span>。</div>
+              </div>
+            </div>
+
+            {/* 导航 */}
+            <div className="bg-white border border-stone-200 rounded p-4">
+              <h4 className="font-bold text-base mb-2">导航 (Navigation)</h4>
+              <p className="text-sm leading-relaxed text-stone-700">
+                如果在旅行时地形或天气令人迷向，游戏主持人可能会要求队伍领袖进行一次<span className="font-bold">感知检定</span>（由游戏主持人秘密掷骰），以确定他们是否会移动到<span className="font-bold">随机的相邻六角格</span>中。
+              </p>
+            </div>
+
+            {/* 探索 */}
+            <div className="bg-amber-50 border border-amber-200 rounded p-4">
+              <h4 className="font-bold text-base mb-2 text-amber-900">探索 (Exploration)</h4>
+              <p className="text-sm leading-relaxed text-stone-700 mb-2">
+                队伍可以花费一个值夜班次探索一个<span className="font-bold">六英里六角格</span>的区域，以揭示任何途经时不会注意到的感兴趣区域（例如，杂草丛生的废墙、隐蔽的水池等）。
+              </p>
+              <div className="text-xs text-stone-600 border-t border-amber-100 pt-2">
+                <span className="font-bold text-amber-800">秘密特征：</span>秘密特征（例如埋藏的宝藏或通往山中的暗门）应该有相应的线索，通过探索该六角格来揭示。它们只能通过玩家角色与游戏世界互动来找到。
+              </div>
+            </div>
+
+            {/* 觅食 */}
+            <div className="bg-green-50 border border-green-200 rounded p-4">
+              <h4 className="font-bold text-base mb-2 text-green-900">觅食 (Foraging)</h4>
+              <p className="text-sm leading-relaxed text-stone-700">
+                寻找食物需要一个值夜班次，并需通过一次<span className="font-bold">感知检定</span>，检定会因天气、地形等因素而有修正値。成功时，一个玩家角色会收集到 <span className="font-bold text-green-700">d6 份口粮</span>。
+              </p>
+            </div>
+
+            {/* 旅行危险骰 */}
+            <div className="bg-white border border-stone-200 rounded p-4">
+              <h4 className="font-bold text-base mb-2">旅行危险骰 (Hazard Die)</h4>
+              <p className="text-sm leading-relaxed text-stone-700">
+                在每个<span className="font-bold">值夜班次结束时</span>，掷旅行危险骰并应用其结果。
+              </p>
+              <p className="text-xs text-stone-500 mt-2 italic">可参阅主持人工具中的「旅行危险」随机表。</p>
+            </div>
+
+          </div>
+        </section>
+
       </div>
-    </div>
+    </div >
   );
 };
 
