@@ -68,8 +68,21 @@ const CharacterSheet: React.FC<CharacterSheetProps> = ({ character, onEdit }) =>
     md += `\n`;
 
     md += `## 特征\n\n`;
+    const TRAIT_LABELS: Record<string, string> = {
+      background: '背景 Background',
+      physique: '体格 Physique',
+      face: '面容 Face',
+      skin: '皮肤 Skin',
+      hair: '毛发 Hair',
+      clothing: '衣物 Clothing',
+      speech: '言谈 Speech',
+      virtue: '美德 Virtue',
+      vice: '恶癖 Vice',
+      misfortune: '厄运 Misfortune',
+      alignment: '阵营 Alignment',
+    };
     Object.entries(character.traits).forEach(([k, v]) => {
-      md += `- **${k.toUpperCase()}:** ${v || '---'}\n`;
+      md += `- **${TRAIT_LABELS[k] || k.toUpperCase()}:** ${v || '---'}\n`;
     });
     md += `\n`;
 
@@ -185,15 +198,32 @@ const CharacterSheet: React.FC<CharacterSheetProps> = ({ character, onEdit }) =>
             {/* Right Column: Traits */}
             <div className="col-span-8 border-2 border-black p-3 relative bg-stone-50/30">
               <h3 className="font-bold uppercase text-xs border-b-2 border-black mb-2 inline-block">Character Description</h3>
-              <div className="flex border-b border-black text-xs font-serif font-bold h-12">
-                <div className="flex-1 flex flex-col justify-center px-4 border-r border-black relative">
-                  <div className="uppercase text-[10px] text-stone-500 absolute top-1 left-2">BACKGROUND</div>
-                  <div className="pt-3">{character.traits.background}</div>
+              {/* Background row */}
+              <div className="flex border-b border-black text-xs font-serif font-bold h-8 mb-1">
+                <div className="flex-1 flex flex-col justify-center px-2 relative">
+                  <div className="uppercase text-[8px] text-stone-400">BACKGROUND</div>
+                  <div className="text-sm font-bold">{character.traits.background || '—'}</div>
                 </div>
-                <div className="flex-1 flex flex-col justify-center px-4 relative">
-                  <div className="uppercase text-[10px] text-stone-500 absolute top-1 left-2">MISFORTUNE</div>
-                  <div className="pt-3">{character.traits.misfortune}</div>
-                </div>
+              </div>
+              {/* Traits grid: 2 columns x 5 rows */}
+              <div className="grid grid-cols-2 gap-x-2 gap-y-0.5 text-[10px]">
+                {([
+                  ['PHYSIQUE 体格', character.traits.physique],
+                  ['FACE 面容', character.traits.face],
+                  ['SKIN 皮肤', character.traits.skin],
+                  ['HAIR 毛发', character.traits.hair],
+                  ['CLOTHING 衣物', character.traits.clothing],
+                  ['SPEECH 言谈', character.traits.speech],
+                  ['VIRTUE 美德', character.traits.virtue],
+                  ['VICE 恶癖', character.traits.vice],
+                  ['MISFORTUNE 厄运', character.traits.misfortune],
+                  ['ALIGNMENT 阵营', character.traits.alignment],
+                ] as [string, string][]).map(([label, value]) => (
+                  <div key={label} className="flex flex-col border-b border-stone-200 py-0.5">
+                    <span className="uppercase text-[8px] text-stone-400 leading-none">{label}</span>
+                    <span className="font-serif font-bold text-[11px] text-stone-800 leading-tight">{value || '—'}</span>
+                  </div>
+                ))}
               </div>
               <div className="absolute top-2 right-3 text-[8px] text-stone-300 font-mono">ID: {secureRandom().toString(36).substr(2, 9).toUpperCase()}</div>
             </div>

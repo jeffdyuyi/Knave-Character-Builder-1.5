@@ -5,5 +5,7 @@ export * from './spells';
 export * from './prices';
 export * from './rules';
 export * from './npc';
+export * from './names';
+export * from './monsters';
 export * from './environment';
 export * from './dungeon';
