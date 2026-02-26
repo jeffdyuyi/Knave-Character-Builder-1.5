@@ -122,7 +122,7 @@ const InventoryBlock: React.FC<InventoryBlockProps> = ({
                   <div className="flex items-center gap-2 flex-grow">
                     {/* Slot Count */}
                     <button
-                      onClick={() => onUpdateItem(item.id, { slots: Math.max(0, (item.slots || 0) + 1) % 10 })}
+                      onClick={() => onUpdateItem(item.id, { slots: Math.min(9, (item.slots || 0) + 1) })}
                       title="点击修改占用栏位"
                       className="w-6 h-6 flex-shrink-0 flex items-center justify-center bg-stone-200 hover:bg-stone-300 rounded-full text-xs font-bold text-stone-600 transition-colors"
                     >

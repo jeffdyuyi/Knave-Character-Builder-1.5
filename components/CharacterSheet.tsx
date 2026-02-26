@@ -1,8 +1,7 @@
-import React, { useRef, useCallback } from 'react';
+import React, { useRef, useCallback, useMemo } from 'react';
 import { Character, StatName, Stat } from '../types';
 import { toPng } from 'html-to-image';
 import { Download, ArrowLeft, Loader2, FileText, Heart, Package, Shield, Swords, Activity, Map, ArrowDown, Save } from 'lucide-react';
-import { secureRandom } from '../utils';
 
 interface CharacterSheetProps {
   character: Character;
@@ -22,9 +21,12 @@ const CharacterSheet: React.FC<CharacterSheetProps> = ({ character, onEdit }) =>
   // Calculate Armor Class from inventory (Knave 2)
   const armorItems = character.inventory.filter(i => i.type === 'armor');
 
-  // In Knave 2, base AC is 11, and each armor piece gives its defense points.
-  const totalDefense = 11 + armorItems.reduce((sum, i) => sum + (i.defense || 0), 0);
+  // In Knave 2, base AC is 11, and each armor piece gives its defense points. Cap at 18.
+  const totalDefense = Math.min(18, 11 + armorItems.reduce((sum, i) => sum + (i.defense || 0), 0));
   const armorDescription = armorItems.length > 0 ? armorItems.map(i => i.name).join(' + ') : '无甲 (Unarmored)';
+
+  // Stable display ID derived from character ID (not re-generated on every render)
+  const displayId = useMemo(() => character.id.replace(/-/g, '').slice(0, 9).toUpperCase(), [character.id]);
 
   const handleDownloadPng = useCallback(async () => {
     if (sheetRef.current === null) {
@@ -225,7 +227,7 @@ const CharacterSheet: React.FC<CharacterSheetProps> = ({ character, onEdit }) =>
                   </div>
                 ))}
               </div>
-              <div className="absolute top-2 right-3 text-[8px] text-stone-300 font-mono">ID: {secureRandom().toString(36).substr(2, 9).toUpperCase()}</div>
+              <div className="absolute top-2 right-3 text-[8px] text-stone-300 font-mono">ID: {displayId}</div>
             </div>
           </div>
 

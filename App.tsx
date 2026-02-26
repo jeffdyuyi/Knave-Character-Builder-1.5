@@ -12,7 +12,8 @@ import {
   pick,
   createItem,
   d,
-  d20
+  d20,
+  secureRandom
 } from './utils';
 import {
   INITIAL_STATS,
@@ -177,16 +178,13 @@ const App: React.FC = () => {
   }, []);
 
   const randomizeTraits = useCallback(() => {
-    const newTraits: Traits = { ...character.traits } as Traits;
-    (Object.keys(TRAIT_TABLES) as Array<keyof typeof TRAIT_TABLES>).forEach(key => {
-      newTraits[key as keyof Traits] = pick(TRAIT_TABLES[key]);
-    });
-    // Add random background
     const randomCareer = pick(CAREERS);
-    newTraits.background = randomCareer.name;
-
-    // Auto-add items for the random career
     setCharacter(prev => {
+      const newTraits: Traits = { ...prev.traits };
+      (Object.keys(TRAIT_TABLES) as Array<keyof typeof TRAIT_TABLES>).forEach(key => {
+        newTraits[key as keyof Traits] = pick(TRAIT_TABLES[key]);
+      });
+      newTraits.background = randomCareer.name;
       const careerItems = randomCareer.items.map(itemName => createItem(itemName, 1, 'gear'));
       return {
         ...prev,
@@ -194,7 +192,7 @@ const App: React.FC = () => {
         inventory: [...prev.inventory, ...careerItems]
       };
     });
-  }, [character.traits]);
+  }, []);
 
   const handleBackgroundChange = useCallback((careerName: string) => {
     setCharacter(prev => {
@@ -232,7 +230,7 @@ const App: React.FC = () => {
     newInventory.push(createItem("箭袋与箭矢 (20)", 1, 'gear'));
 
     // Weapon or Armor
-    if (Math.random() > 0.5) {
+    if (secureRandom() > 0.5) {
       const weapons = [
         { name: "匕首", damage: 'd6', slots: 1 },
         { name: "棍棒", damage: 'd6', slots: 1 },
