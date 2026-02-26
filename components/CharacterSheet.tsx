@@ -340,7 +340,7 @@ const CharacterSheet: React.FC<CharacterSheetProps> = ({ character, onEdit }) =>
                   <div style={{ fontSize: '18px', fontWeight: 'bold', lineHeight: 1.1 }}>{character.hp.max}</div>
                 </div>
                 {/* HP 竖向书签 */}
-                <div style={{ border: '2px solid black', width: '10mm', flexGrow: 1, minHeight: '25mm', display: 'flex', flexDirection: 'column' }}>
+                <div style={{ border: '2px solid black', width: '10mm', height: '44mm', display: 'flex', flexDirection: 'column' }}>
                   <div style={{ fontSize: '7px', fontWeight: 'bold', textAlign: 'center', padding: '1mm', borderBottom: '1px solid black', writingMode: 'vertical-rl', transform: 'rotate(180deg)', alignSelf: 'stretch', display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%' }}>
                     HP
                   </div>
@@ -348,14 +348,14 @@ const CharacterSheet: React.FC<CharacterSheetProps> = ({ character, onEdit }) =>
               </div>
 
               {/* PORTRAIT 大框 */}
-              <div style={{ border: '2px solid black', flexGrow: 1, minHeight: '38mm', display: 'flex', flexDirection: 'column' }}>
-                <div style={{ fontSize: '7px', fontWeight: 'bold', letterSpacing: '1px', padding: '1mm 2mm', borderBottom: '1.5px solid black' }}>PORTRAIT</div>
+              <div style={{ border: '2px solid black', flexGrow: 1, height: '62mm', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+                <div style={{ fontSize: '7px', fontWeight: 'bold', letterSpacing: '1px', padding: '1mm 2mm', borderBottom: '1.5px solid black', flexShrink: 0 }}>PORTRAIT</div>
                 {/* 特征信息 */}
-                <div style={{ padding: '2mm', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5mm 2mm', flexGrow: 1 }}>
+                <div style={{ padding: '1.5mm 2mm', display: 'grid', gridTemplateColumns: '1fr 1fr', gridTemplateRows: 'repeat(4, 1fr)', gap: '1mm 2mm', flexGrow: 1, overflow: 'hidden' }}>
                   {Object.entries(character.traits).filter(([k]) => k !== 'background').map(([k, v]) => (
-                    <div key={k} style={{ borderBottom: '0.5px solid #ccc', paddingBottom: '0.5mm' }}>
+                    <div key={k} style={{ borderBottom: '0.5px solid #ccc', paddingBottom: '1mm', overflow: 'hidden' }}>
                       <div style={{ fontSize: '6px', fontWeight: 'bold', color: '#666', textTransform: 'uppercase', lineHeight: 1 }}>{TRAIT_LABELS[k]?.split(' ')[0] || k}</div>
-                      <div style={{ fontSize: '8px', fontWeight: 'bold', lineHeight: 1.2 }}>{v || '—'}</div>
+                      <div style={{ fontSize: '8px', fontWeight: 'bold', lineHeight: 1.2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{v || '—'}</div>
                     </div>
                   ))}
                 </div>
