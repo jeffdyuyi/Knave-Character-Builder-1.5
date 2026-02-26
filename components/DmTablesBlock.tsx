@@ -1,10 +1,13 @@
 import React, { useState } from 'react';
-import { TRAIT_TABLES, CAREERS, DUNGEONEERING_GEAR, GENERAL_GEAR_1, GENERAL_GEAR_2, SPELLS_DATA, NPC_IDENTITIES } from '../constants';
+import { TRAIT_TABLES, CAREERS, DUNGEONEERING_GEAR, GENERAL_GEAR_1, GENERAL_GEAR_2, SPELLS_DATA, NPC_IDENTITIES, TRAVEL_HAZARDS, WEATHER_CONDITIONS_2D6, TRAVEL_EVENTS } from '../constants';
 import { Dices, Plus, Trash2, Settings, List } from 'lucide-react';
 
 // Registry of all random tables
 const TABLES_REGISTRY = [
     { id: 'npc_ident', name: 'NPC 社会身份 (d100)', items: NPC_IDENTITIES },
+    { id: 'travel_hazards', name: '旅行危险 (d6)', items: TRAVEL_HAZARDS },
+    { id: 'weather', name: '天气与气候变动 (2d6)', items: WEATHER_CONDITIONS_2D6 },
+    { id: 'travel_events', name: '旅行环境变动异象 (d100)', items: TRAVEL_EVENTS },
     { id: 'careers', name: '职业/背景 (d100)', items: CAREERS.map(c => c.name) },
     { id: 'spells', name: '无等级法术 (d100)', items: SPELLS_DATA.map(s => s.name) },
     { id: 'dungeon_gear', name: '地城装备 (d20)', items: DUNGEONEERING_GEAR },
