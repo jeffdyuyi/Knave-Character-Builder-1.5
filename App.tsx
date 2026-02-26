@@ -309,8 +309,8 @@ const App: React.FC = () => {
     <div className="min-h-screen p-4 sm:p-8 max-w-7xl mx-auto flex flex-col">
       <header className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 border-b-2 border-stone-800 pb-4 gap-4 md:gap-0">
         <div>
-          <h1 className="text-4xl sm:text-5xl font-black uppercase tracking-tighter text-stone-900 leading-none">Knave</h1>
-          <h2 className="text-xl sm:text-2xl font-serif text-stone-600 italic">恶棍角色生成器</h2>
+          <h1 className="text-4xl sm:text-5xl font-black uppercase tracking-tighter text-stone-900 leading-none">KNAVE2E个人翻译</h1>
+          <h2 className="text-xl sm:text-2xl font-serif text-stone-600 italic">Q1</h2>
 
           {/* Credits Section */}
           <div className="mt-3 pt-2 border-t border-stone-300 text-[10px] sm:text-xs font-serif text-stone-500 space-y-1">
@@ -322,12 +322,12 @@ const App: React.FC = () => {
             </p>
             <div className="flex flex-col sm:flex-row gap-1 sm:gap-3">
               <a
-                href="https://questingbeast.itch.io/knave"
+                href="https://questingbeast.itch.io/knave-second-edition"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center gap-1 hover:text-amber-700 hover:underline transition-colors"
               >
-                <ExternalLink size={10} /> Knave 英文原作
+                <ExternalLink size={10} /> 英文原作
               </a>
               <span className="hidden sm:inline text-stone-300">|</span>
               <a
@@ -347,6 +347,7 @@ const App: React.FC = () => {
 
         <div className="flex gap-4 self-end md:self-center">
           <div className="bg-white rounded-full shadow-lg p-1 flex gap-2 sm:gap-0">
+            {/* 编辑 */}
             <button
               onClick={() => setViewMode('edit')}
               className={`flex flex-col items-center justify-center w-16 h-16 sm:w-20 sm:h-20 rounded-full transition-all ${viewMode === 'edit' ? 'bg-stone-800 text-white shadow-inner' : 'text-stone-600 hover:bg-stone-100'}`}
@@ -355,30 +356,7 @@ const App: React.FC = () => {
               <PenTool size={20} className="sm:w-6 sm:h-6" />
               <span className="text-[10px] sm:text-xs font-bold mt-1">编辑</span>
             </button>
-            <button
-              onClick={() => setViewMode('rules')}
-              className={`flex flex-col items-center justify-center w-16 h-16 sm:w-20 sm:h-20 rounded-full transition-all ${viewMode === 'rules' ? 'bg-stone-800 text-white shadow-inner' : 'text-stone-600 hover:bg-stone-100'}`}
-              title="核心规则"
-            >
-              <BookOpen size={20} className="sm:w-6 sm:h-6" />
-              <span className="text-[10px] sm:text-xs font-bold mt-1">规则</span>
-            </button>
-            <button
-              onClick={() => setViewMode('tables')}
-              className={`flex flex-col items-center justify-center w-16 h-16 sm:w-20 sm:h-20 rounded-full transition-all ${viewMode === 'tables' ? 'bg-stone-800 text-white shadow-inner' : 'text-stone-600 hover:bg-stone-100'}`}
-              title="法术与物品速查"
-            >
-              <List size={20} className="sm:w-6 sm:h-6" />
-              <span className="text-[10px] sm:text-xs font-bold mt-1">速查</span>
-            </button>
-            <button
-              onClick={() => setViewMode('dm')}
-              className={`flex flex-col items-center justify-center w-16 h-16 sm:w-20 sm:h-20 rounded-full transition-all ${viewMode === 'dm' ? 'bg-stone-800 text-white shadow-inner' : 'text-stone-600 hover:bg-stone-100'}`}
-              title="主持人工具"
-            >
-              <Box size={20} className="sm:w-6 sm:h-6" />
-              <span className="text-[10px] sm:text-xs font-bold mt-1">DM工具</span>
-            </button>
+            {/* 备忘 */}
             <button
               onClick={() => setViewMode('memo')}
               className={`flex flex-col items-center justify-center w-16 h-16 sm:w-20 sm:h-20 rounded-full transition-all ${viewMode === 'memo' ? 'bg-stone-800 text-white shadow-inner' : 'text-stone-600 hover:bg-stone-100'}`}
@@ -387,6 +365,34 @@ const App: React.FC = () => {
               <StickyNote size={20} className="sm:w-6 sm:h-6" />
               <span className="text-[10px] sm:text-xs font-bold mt-1">备忘</span>
             </button>
+            {/* 速查 */}
+            <button
+              onClick={() => setViewMode('tables')}
+              className={`flex flex-col items-center justify-center w-16 h-16 sm:w-20 sm:h-20 rounded-full transition-all ${viewMode === 'tables' ? 'bg-stone-800 text-white shadow-inner' : 'text-stone-600 hover:bg-stone-100'}`}
+              title="法术与物品速查"
+            >
+              <List size={20} className="sm:w-6 sm:h-6" />
+              <span className="text-[10px] sm:text-xs font-bold mt-1">速查</span>
+            </button>
+            {/* 规则 */}
+            <button
+              onClick={() => setViewMode('rules')}
+              className={`flex flex-col items-center justify-center w-16 h-16 sm:w-20 sm:h-20 rounded-full transition-all ${viewMode === 'rules' ? 'bg-stone-800 text-white shadow-inner' : 'text-stone-600 hover:bg-stone-100'}`}
+              title="核心规则"
+            >
+              <BookOpen size={20} className="sm:w-6 sm:h-6" />
+              <span className="text-[10px] sm:text-xs font-bold mt-1">规则</span>
+            </button>
+            {/* DM工具 */}
+            <button
+              onClick={() => setViewMode('dm')}
+              className={`flex flex-col items-center justify-center w-16 h-16 sm:w-20 sm:h-20 rounded-full transition-all ${viewMode === 'dm' ? 'bg-stone-800 text-white shadow-inner' : 'text-stone-600 hover:bg-stone-100'}`}
+              title="主持人工具"
+            >
+              <Box size={20} className="sm:w-6 sm:h-6" />
+              <span className="text-[10px] sm:text-xs font-bold mt-1">DM工具</span>
+            </button>
+            {/* 角色卡 */}
             <button
               onClick={() => setViewMode('sheet')}
               className="flex flex-col items-center justify-center bg-blue-700 text-white w-16 h-16 sm:w-20 sm:h-20 rounded-full shadow-lg hover:bg-blue-600 hover:scale-105 transition-all ml-2"

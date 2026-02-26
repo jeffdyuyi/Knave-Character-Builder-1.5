@@ -1,12 +1,20 @@
 import React, { useState } from 'react';
 import { SPELLS_DATA, ITEM_PRICES, MAGIC_RULES } from '../constants';
-import { Search, ScrollText, Coins, Sparkles, Book, ShieldAlert } from 'lucide-react';
+import { Search, ScrollText, Coins, Sparkles, Book, ShieldAlert, Dices } from 'lucide-react';
+import { secureRandom } from '../utils';
 
 const ReferenceBlock: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'spells' | 'items'>('spells');
   const [filter, setFilter] = useState('');
+  const [randomSpell, setRandomSpell] = useState<typeof SPELLS_DATA[0] | null>(null);
 
   const filteredSpells = SPELLS_DATA.filter(s => s.name.toLowerCase().includes(filter.toLowerCase()));
+
+  const handleRandomSpell = () => {
+    const idx = Math.floor(secureRandom() * SPELLS_DATA.length);
+    setRandomSpell(SPELLS_DATA[idx]);
+    setFilter(''); // 清空筛选，让高亮可见
+  };
 
   return (
     <div className="bg-white rounded-sm shadow-md border-2 border-stone-800 flex flex-col min-h-[500px]">
@@ -38,15 +46,26 @@ const ReferenceBlock: React.FC = () => {
 
       {/* Search */}
       <div className="p-4 border-b border-stone-200 bg-stone-50">
-        <div className="relative">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-stone-400" size={18} />
-          <input
-            type="text"
-            placeholder={activeTab === 'spells' ? "搜索法术..." : "搜索物品..."}
-            value={filter}
-            onChange={(e) => setFilter(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 border border-stone-300 rounded focus:outline-none focus:border-stone-600 font-serif"
-          />
+        <div className="flex gap-2">
+          <div className="relative flex-grow">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-stone-400" size={18} />
+            <input
+              type="text"
+              placeholder={activeTab === 'spells' ? "搜索法术..." : "搜索物品..."}
+              value={filter}
+              onChange={(e) => { setFilter(e.target.value); setRandomSpell(null); }}
+              className="w-full pl-10 pr-4 py-2 border border-stone-300 rounded focus:outline-none focus:border-stone-600 font-serif"
+            />
+          </div>
+          {activeTab === 'spells' && (
+            <button
+              onClick={handleRandomSpell}
+              className="flex items-center gap-1.5 px-3 py-2 bg-amber-700 hover:bg-amber-800 active:bg-amber-900 text-white font-bold rounded transition-colors shrink-0 text-sm"
+              title="随机获取一条法术"
+            >
+              <Dices size={16} /> 随机法术
+            </button>
+          )}
         </div>
       </div>
 
@@ -77,12 +96,30 @@ const ReferenceBlock: React.FC = () => {
             )}
 
             {/* Spells List */}
+            {/* 随机法术结果卡片 */}
+            {randomSpell && (
+              <div className="mb-4 p-4 bg-amber-50 border-2 border-amber-400 rounded shadow-sm">
+                <div className="flex items-center justify-between mb-1">
+                  <span className="text-xs font-bold text-amber-600 uppercase tracking-wider flex items-center gap-1">
+                    <Dices size={12} /> 随机法术结果
+                  </span>
+                  <button onClick={() => setRandomSpell(null)} className="text-amber-400 hover:text-amber-700 text-xs font-bold">✕ 关闭</button>
+                </div>
+                <div className="font-serif font-bold text-stone-900 text-lg">{randomSpell.name}</div>
+                <p className="text-sm text-stone-700 mt-1 leading-snug">{randomSpell.desc}</p>
+              </div>
+            )}
+
+            {/* 法术列表 */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
               {filteredSpells.length > 0 ? (
                 filteredSpells.map((spell, idx) => (
                   <div
                     key={idx}
-                    className="group relative p-3 border border-stone-200 hover:bg-stone-50 hover:border-stone-400 rounded transition-colors"
+                    className={`group relative p-3 border rounded transition-colors ${randomSpell?.name === spell.name
+                        ? 'border-amber-400 bg-amber-50 ring-2 ring-amber-300'
+                        : 'border-stone-200 hover:bg-stone-50 hover:border-stone-400'
+                      }`}
                   >
                     <div className="flex gap-2 items-baseline mb-1">
                       <span className="font-mono text-stone-400 text-xs w-6 text-right font-bold">{idx + 1}.</span>
