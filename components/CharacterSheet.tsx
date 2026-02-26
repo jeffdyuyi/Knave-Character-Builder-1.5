@@ -51,44 +51,44 @@ const CharacterSheet: React.FC<CharacterSheetProps> = ({ character, onEdit }) =>
     }
   }, [character.name]);
 
-  const handleDownloadTxt = useCallback(() => {
-    let txt = `==== KNAVE 角色卡 ====\n`;
-    txt += `姓名: ${character.name || '无名氏'}\n`;
-    txt += `等级: ${character.level} | 经验值: ${character.xp}/1000\n`;
-    txt += `生命值 (HP): ${character.hp.current} / ${character.hp.max}\n`;
-    txt += `护甲 (AC): ${totalDefense}\n\n`;
+  const handleDownloadMd = useCallback(() => {
+    let md = `# KNAVE 角色卡\n\n`;
+    md += `**姓名:** ${character.name || '无名氏'}\n\n`;
+    md += `**等级:** ${character.level} | **经验值:** ${character.xp}/1000\n\n`;
+    md += `**生命值 (HP):** ${character.hp.current} / ${character.hp.max}\n\n`;
+    md += `**护甲 (AC):** ${totalDefense}\n\n`;
 
-    txt += `[属性]\n`;
+    md += `## 属性\n\n`;
     (Object.values(character.stats) as Stat[]).forEach(stat => {
-      txt += `${stat.name}: ${stat.value}\n`;
+      md += `- **${stat.name}:** ${stat.value}\n`;
     });
-    txt += `\n`;
+    md += `\n`;
 
-    txt += `[特征]\n`;
+    md += `## 特征\n\n`;
     Object.entries(character.traits).forEach(([k, v]) => {
-      txt += `${k.toUpperCase()}: ${v || '---'}\n`;
+      md += `- **${k.toUpperCase()}:** ${v || '---'}\n`;
     });
-    txt += `\n`;
+    md += `\n`;
 
-    txt += `[物品栏 (${character.inventory.reduce((s, i) => s + (i.slots || 0), 0)}/${maxSlots} 栏位)]\n`;
+    md += `## 物品栏 (${character.inventory.reduce((s, i) => s + (i.slots || 0), 0)}/${maxSlots} 栏位)\n\n`;
     character.inventory.forEach((i, idx) => {
-      txt += `${idx + 1}. ${i.name}`;
-      if (i.slots !== 1) txt += ` (${i.slots}栏位)`;
-      if (i.type === 'weapon' && i.damage) txt += ` [伤害:${i.damage}]`;
-      if (i.type === 'armor' && i.defense) txt += ` [防御:+${i.defense}]`;
-      if (i.quality !== undefined && i.quality > 0) txt += ` (耐久:${i.quality})`;
-      txt += `\n`;
+      md += `${idx + 1}. **${i.name}**`;
+      if (i.slots !== 1) md += ` (${i.slots}栏位)`;
+      if (i.type === 'weapon' && i.damage) md += ` [伤害:${i.damage}]`;
+      if (i.type === 'armor' && i.defense) md += ` [防御:+${i.defense}]`;
+      if (i.quality !== undefined && i.quality > 0) md += ` (耐久:${i.quality})`;
+      md += `\n`;
     });
 
     if (character.memo) {
-      txt += `\n[个人备忘]\n${character.memo}\n`;
+      md += `\n## 个人备忘\n\n${character.memo}\n`;
     }
 
-    const blob = new Blob([txt], { type: 'text/plain;charset=utf-8' });
+    const blob = new Blob([md], { type: 'text/markdown;charset=utf-8' });
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
-    link.download = `${character.name || 'Knave_Character'}_Sheet.txt`;
+    link.download = `${character.name || 'Knave_Character'}_Sheet.md`;
     link.click();
     URL.revokeObjectURL(url);
   }, [character, totalDefense, maxSlots]);
@@ -106,11 +106,11 @@ const CharacterSheet: React.FC<CharacterSheetProps> = ({ character, onEdit }) =>
         </button>
         <div className="flex gap-2 w-full sm:w-auto">
           <button
-            onClick={handleDownloadTxt}
+            onClick={handleDownloadMd}
             className="flex items-center justify-center gap-2 bg-stone-100 text-stone-800 border border-stone-300 px-4 py-2 rounded shadow hover:bg-stone-50 transition-all font-bold flex-grow sm:flex-grow-0"
           >
             <FileText size={20} />
-            保存为TXT
+            保存为MD
           </button>
           <button
             onClick={handleDownloadPng}
