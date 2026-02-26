@@ -14,7 +14,9 @@ const CharacterSheet: React.FC<CharacterSheetProps> = ({ character, onEdit }) =>
 
   // Generate empty rows for printing if inventory is not full
   const maxSlots = 10 + character.stats[StatName.Constitution].value;
-  const emptySlots = Math.max(0, maxSlots - character.inventory.length);
+  const renderCount = Math.max(maxSlots, character.inventory.length);
+  const leftColCount = Math.ceil(renderCount / 2);
+  const rightColCount = renderCount - leftColCount;
 
   // Calculate Armor Class from inventory (Knave 2)
   const armorItems = character.inventory.filter(i => i.type === 'armor');
@@ -124,7 +126,7 @@ const CharacterSheet: React.FC<CharacterSheetProps> = ({ character, onEdit }) =>
       </div>
 
       {/* The Sheet - Capture Target */}
-      <div ref={sheetRef} className="bg-white p-8 shadow-2xl print:shadow-none print:p-0 text-black aspect-[210/297] flex flex-col relative overflow-hidden">
+      <div ref={sheetRef} className="bg-white p-8 shadow-2xl print:shadow-none print:p-0 text-black min-h-[297mm] flex flex-col relative">
         {character.isDead && (
           <div className="absolute inset-0 z-50 pointer-events-none flex items-center justify-center overflow-hidden">
             <div className="text-red-700/20 font-black text-[120px] md:text-[180px] -rotate-45 uppercase border-[12px] md:border-[16px] border-red-700/20 px-8 py-4 tracking-widest pointer-events-none">
@@ -147,7 +149,7 @@ const CharacterSheet: React.FC<CharacterSheetProps> = ({ character, onEdit }) =>
         </div>
 
         {/* Main Grid */}
-        <div className="flex flex-col gap-6 flex-grow overflow-hidden">
+        <div className="flex flex-col gap-6 flex-grow">
 
           <div className="grid grid-cols-12 gap-6 shrink-0">
             {/* Left Column: Stats */}
@@ -195,7 +197,7 @@ const CharacterSheet: React.FC<CharacterSheetProps> = ({ character, onEdit }) =>
           </div>
 
           {/* Bottom Section: Inventory - Full Width */}
-          <div className="border-2 border-black flex flex-col flex-grow min-h-0">
+          <div className="border-2 border-black flex flex-col flex-grow">
             <div className="bg-black text-white font-bold px-3 py-1.5 uppercase flex justify-between items-center">
               <div className="flex items-center gap-4">
                 <span className="text-lg tracking-widest">Inventory Slots</span>
@@ -204,10 +206,10 @@ const CharacterSheet: React.FC<CharacterSheetProps> = ({ character, onEdit }) =>
               <span className="text-xs font-mono">Encumbrance: {character.inventory.reduce((s, i) => s + (i.slots || 0), 0)} / {maxSlots}</span>
             </div>
 
-            <div className="grid grid-cols-2 flex-grow overflow-hidden">
+            <div className="grid grid-cols-2 flex-grow">
               {/* Left Inventory Column */}
               <div className="border-r border-black flex flex-col">
-                {Array.from({ length: Math.ceil(maxSlots / 2) }).map((_, idx) => {
+                {Array.from({ length: leftColCount }).map((_, idx) => {
                   const item = character.inventory[idx];
                   return (
                     <div key={`inv-l-${idx}`} className="flex border-b border-stone-300 h-9 items-center px-3 relative group">
@@ -238,10 +240,10 @@ const CharacterSheet: React.FC<CharacterSheetProps> = ({ character, onEdit }) =>
 
               {/* Right Inventory Column */}
               <div className="flex flex-col">
-                {Array.from({ length: Math.ceil(maxSlots / 2) }).map((_, idx) => {
-                  const realIdx = idx + Math.ceil(maxSlots / 2);
+                {Array.from({ length: rightColCount }).map((_, idx) => {
+                  const realIdx = idx + leftColCount;
                   const item = character.inventory[realIdx];
-                  if (realIdx >= maxSlots) return null;
+                  if (realIdx >= renderCount) return null;
                   return (
                     <div key={`inv-r-${idx}`} className="flex border-b border-stone-300 h-9 items-center px-3 relative">
                       <div className="w-6 font-mono text-stone-300 text-[10px] flex-shrink-0">{realIdx + 1}</div>

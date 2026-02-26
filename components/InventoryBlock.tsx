@@ -115,9 +115,9 @@ const InventoryBlock: React.FC<InventoryBlockProps> = ({
         {inventory.length === 0 ? (
           <div className="text-center text-stone-400 py-8 italic">空空如也...</div>
         ) : (
-          <ul className="divide-y divide-stone-100">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 p-2">
             {inventory.map((item) => (
-              <li key={item.id} className="p-2 hover:bg-stone-50 group transition-colors">
+              <div key={item.id} className="p-2 border border-stone-200 rounded-sm hover:bg-stone-50 group transition-colors shadow-sm">
                 <div className="flex justify-between items-center mb-1">
                   <div className="flex items-center gap-2 flex-grow">
                     {/* Slot Count */}
@@ -224,9 +224,9 @@ const InventoryBlock: React.FC<InventoryBlockProps> = ({
                   </div>
 
                 </div>
-              </li>
+              </div>
             ))}
-          </ul>
+          </div>
         )}
       </div>
 

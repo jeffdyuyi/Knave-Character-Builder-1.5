@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { SPELLS_DATA, ITEM_PRICES, MAGIC_RULES, TRAIT_TABLES, DUNGEONEERING_GEAR, GENERAL_GEAR_1, GENERAL_GEAR_2 } from '../constants';
+import { SPELLS_DATA, ITEM_PRICES, MAGIC_RULES, TRAIT_TABLES, DUNGEONEERING_GEAR, GENERAL_GEAR_1, GENERAL_GEAR_2, CAREERS } from '../constants';
 import { Search, ScrollText, Coins, Sparkles, Book, ShieldAlert, Dices } from 'lucide-react';
 
 const ReferenceBlock: React.FC = () => {
@@ -158,6 +158,7 @@ const ReferenceBlock: React.FC = () => {
           <div className="space-y-6">
             {[
               { id: 'traits', title: "角色特征表 (d20)", records: Object.entries(TRAIT_TABLES).map(([k, v]) => ({ name: k.toUpperCase(), items: v })) },
+              { id: 'careers', title: "建卡职业表 (d100)", records: [{ name: '职业 (Careers)', items: CAREERS.map(c => `${c.name} (${c.items.join(', ')})`) }] },
               {
                 id: 'gear', title: "地城与起始装备表 (d20)", records: [
                   { name: '地城探险装备 (Dungeoneering Gear)', items: DUNGEONEERING_GEAR },

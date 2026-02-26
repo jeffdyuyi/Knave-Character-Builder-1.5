@@ -20,7 +20,8 @@ import {
   STARTING_ARMOR,
   DUNGEONEERING_GEAR,
   GENERAL_GEAR_1,
-  GENERAL_GEAR_2
+  GENERAL_GEAR_2,
+  CAREERS
 } from './constants';
 import StatBlock from './components/StatBlock';
 import TraitBlock from './components/TraitBlock';
@@ -175,11 +176,42 @@ const App: React.FC = () => {
   }, []);
 
   const randomizeTraits = useCallback(() => {
-    const newTraits = {} as Traits;
-    (Object.keys(TRAIT_TABLES) as Array<keyof Traits>).forEach(key => {
-      newTraits[key] = pick(TRAIT_TABLES[key]);
+    const newTraits: Traits = { ...character.traits } as Traits;
+    (Object.keys(TRAIT_TABLES) as Array<keyof typeof TRAIT_TABLES>).forEach(key => {
+      newTraits[key as keyof Traits] = pick(TRAIT_TABLES[key]);
     });
-    setCharacter(prev => ({ ...prev, traits: newTraits }));
+    // Add random background
+    const randomCareer = pick(CAREERS);
+    newTraits.background = randomCareer.name;
+
+    // Auto-add items for the random career
+    setCharacter(prev => {
+      const careerItems = randomCareer.items.map(itemName => createItem(itemName, 1, 'gear'));
+      return {
+        ...prev,
+        traits: newTraits,
+        inventory: [...prev.inventory, ...careerItems]
+      };
+    });
+  }, [character.traits]);
+
+  const handleBackgroundChange = useCallback((careerName: string) => {
+    setCharacter(prev => {
+      const career = CAREERS.find(c => c.name === careerName);
+      let newInventory = [...prev.inventory];
+
+      if (career) {
+        // Add items to inventory
+        const careerItems = career.items.map(itemName => createItem(itemName, 1, 'gear'));
+        newInventory = [...newInventory, ...careerItems];
+      }
+
+      return {
+        ...prev,
+        traits: { ...prev.traits, background: careerName },
+        inventory: newInventory
+      };
+    });
   }, []);
 
   const generateStartingGear = useCallback(() => {
@@ -505,7 +537,7 @@ const App: React.FC = () => {
 
               {/* Column 2: Traits */}
               <div className="h-full">
-                <TraitBlock traits={character.traits} onRandomize={randomizeTraits} />
+                <TraitBlock traits={character.traits} onRandomize={randomizeTraits} onBackgroundChange={handleBackgroundChange} />
               </div>
 
             </div> {/* End of Top Grid */}
