@@ -30,7 +30,8 @@ import CharacterSheet from './components/CharacterSheet';
 import ReferenceBlock from './components/ReferenceBlock';
 import GameRulesBlock from './components/GameRulesBlock';
 import MemoBlock from './components/MemoBlock';
-import { Dices, Printer, RefreshCw, BookOpen, PenTool, List, ExternalLink, StickyNote } from 'lucide-react';
+import DmTablesBlock from './components/DmTablesBlock';
+import { Dices, Printer, RefreshCw, BookOpen, PenTool, List, ExternalLink, StickyNote, Box } from 'lucide-react';
 
 const generateInitialCharacter = (): Character => {
   // Generate Stats (Knave 2: distribute 3 points randomly)
@@ -97,7 +98,7 @@ const App: React.FC = () => {
     return [generateInitialCharacter()];
   });
   const [activeCharId, setActiveCharId] = useState<string>(characters[0]?.id || '');
-  const [viewMode, setViewMode] = useState<'edit' | 'sheet' | 'rules' | 'tables' | 'memo'>('edit');
+  const [viewMode, setViewMode] = useState<'edit' | 'sheet' | 'rules' | 'tables' | 'memo' | 'dm'>('edit');
 
   const character = characters.find(c => c.id === activeCharId) || characters[0] || generateInitialCharacter();
 
@@ -373,6 +374,14 @@ const App: React.FC = () => {
               <span className="text-[10px] sm:text-xs font-bold mt-1">速查</span>
             </button>
             <button
+              onClick={() => setViewMode('dm')}
+              className={`flex flex-col items-center justify-center w-16 h-16 sm:w-20 sm:h-20 rounded-full transition-all ${viewMode === 'dm' ? 'bg-stone-800 text-white shadow-inner' : 'text-stone-600 hover:bg-stone-100'}`}
+              title="主持人工具"
+            >
+              <Box size={20} className="sm:w-6 sm:h-6" />
+              <span className="text-[10px] sm:text-xs font-bold mt-1">DM工具</span>
+            </button>
+            <button
               onClick={() => setViewMode('memo')}
               className={`flex flex-col items-center justify-center w-16 h-16 sm:w-20 sm:h-20 rounded-full transition-all ${viewMode === 'memo' ? 'bg-stone-800 text-white shadow-inner' : 'text-stone-600 hover:bg-stone-100'}`}
               title="个人备忘录"
@@ -396,6 +405,7 @@ const App: React.FC = () => {
       <div className="flex-grow">
         {viewMode === 'rules' && <GameRulesBlock />}
         {viewMode === 'tables' && <ReferenceBlock />}
+        {viewMode === 'dm' && <DmTablesBlock />}
         {viewMode === 'memo' && (
           <MemoBlock
             memo={character.memo || ''}
