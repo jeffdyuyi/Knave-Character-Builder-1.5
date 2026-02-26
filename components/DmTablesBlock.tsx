@@ -1,11 +1,18 @@
 import React, { useState } from 'react';
-import { TRAIT_TABLES, CAREERS, DUNGEONEERING_GEAR, GENERAL_GEAR_1, GENERAL_GEAR_2, SPELLS_DATA, NPC_IDENTITIES, TRAVEL_HAZARDS, WEATHER_CONDITIONS_2D6, TRAVEL_EVENTS } from '../constants';
+import { TRAIT_TABLES, CAREERS, DUNGEONEERING_GEAR, GENERAL_GEAR_1, GENERAL_GEAR_2, SPELLS_DATA, NPC_IDENTITIES, TRAVEL_HAZARDS, WEATHER_CONDITIONS_2D6, TRAVEL_EVENTS, ENVIRONMENT_SIGNS, ENVIRONMENT_LOCATIONS, ENVIRONMENT_STRUCTURES, LOCATION_TRAITS, EXPLORATION_EVENTS, DUNGEON_ROOMS, ROOM_DETAILS } from '../data';
 import { Dices, Plus, Trash2, Settings, List } from 'lucide-react';
 import { secureRandom } from '../utils';
 
 // Registry of all random tables
 const TABLES_REGISTRY = [
     { id: 'npc_ident', name: 'NPC 社会身份 (d100)', items: NPC_IDENTITIES },
+    { id: 'env_signs', name: '环境危险迹象/前兆 (d100)', items: ENVIRONMENT_SIGNS },
+    { id: 'env_locations', name: '自然地貌与地点 (d100)', items: ENVIRONMENT_LOCATIONS },
+    { id: 'env_structures', name: '人造构筑与废墟 (d100)', items: ENVIRONMENT_STRUCTURES },
+    { id: 'loc_traits', name: '地点特性与氛围 (d100)', items: LOCATION_TRAITS },
+    { id: 'explore_events', name: '地下城探索变动 (d100)', items: EXPLORATION_EVENTS },
+    { id: 'dungeon_rooms', name: '房间分区 (d100)', items: DUNGEON_ROOMS },
+    { id: 'room_details', name: '房间细节与物件 (d100)', items: ROOM_DETAILS },
     { id: 'travel_hazards', name: '旅行危险 (d6)', items: TRAVEL_HAZARDS },
     { id: 'weather', name: '天气与气候变动 (2d6)', items: WEATHER_CONDITIONS_2D6 },
     { id: 'travel_events', name: '旅行环境变动异象 (d100)', items: TRAVEL_EVENTS },

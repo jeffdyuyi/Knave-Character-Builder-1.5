@@ -6,3 +6,4 @@ export * from './prices';
 export * from './rules';
 export * from './npc';
 export * from './environment';
+export * from './dungeon';
