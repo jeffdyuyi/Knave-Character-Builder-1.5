@@ -1,7 +1,8 @@
 import React, { useRef, useCallback } from 'react';
 import { Character, StatName, Stat } from '../types';
 import { toPng } from 'html-to-image';
-import { Download, ArrowLeft, Loader2, FileText } from 'lucide-react';
+import { Download, ArrowLeft, Loader2, FileText, Heart, Package, Shield, Swords, Activity, Map, ArrowDown, Save } from 'lucide-react';
+import { secureRandom } from '../utils';
 
 interface CharacterSheetProps {
   character: Character;
@@ -42,7 +43,7 @@ const CharacterSheet: React.FC<CharacterSheetProps> = ({ character, onEdit }) =>
       });
 
       const link = document.createElement('a');
-      link.download = `${character.name || 'Knave_Character'}_Sheet.png`;
+      link.download = `${character.name || 'Knave_Character'} _Sheet.png`;
       link.href = dataUrl;
       link.click();
     } catch (err) {
@@ -55,8 +56,8 @@ const CharacterSheet: React.FC<CharacterSheetProps> = ({ character, onEdit }) =>
 
   const handleDownloadMd = useCallback(() => {
     let md = `# KNAVE 角色卡\n\n`;
-    md += `**姓名:** ${character.name || '无名氏'}\n\n`;
-    md += `**等级:** ${character.level} | **经验值:** ${character.xp}/1000\n\n`;
+    md += `** 姓名:** ${character.name || '无名氏'} \n\n`;
+    md += `** 等级:** ${character.level} | ** 经验值:** ${character.xp}/1000\n\n`;
     md += `**生命值 (HP):** ${character.hp.current} / ${character.hp.max}\n\n`;
     md += `**护甲 (AC):** ${totalDefense}\n\n`;
 
@@ -184,15 +185,17 @@ const CharacterSheet: React.FC<CharacterSheetProps> = ({ character, onEdit }) =>
             {/* Right Column: Traits */}
             <div className="col-span-8 border-2 border-black p-3 relative bg-stone-50/30">
               <h3 className="font-bold uppercase text-xs border-b-2 border-black mb-2 inline-block">Character Description</h3>
-              <div className="grid grid-cols-2 gap-x-4 gap-y-1">
-                {Object.entries(character.traits).map(([key, value]) => (
-                  <div key={key} className="flex items-baseline gap-2 border-b border-stone-200 pb-0.5">
-                    <span className="capitalize text-stone-400 text-[9px] font-bold uppercase min-w-[60px]">{key}:</span>
-                    <span className="font-serif text-sm font-bold truncate">{value || '---'}</span>
-                  </div>
-                ))}
+              <div className="flex border-b border-black text-xs font-serif font-bold h-12">
+                <div className="flex-1 flex flex-col justify-center px-4 border-r border-black relative">
+                  <div className="uppercase text-[10px] text-stone-500 absolute top-1 left-2">BACKGROUND</div>
+                  <div className="pt-3">{character.traits.background}</div>
+                </div>
+                <div className="flex-1 flex flex-col justify-center px-4 relative">
+                  <div className="uppercase text-[10px] text-stone-500 absolute top-1 left-2">MISFORTUNE</div>
+                  <div className="pt-3">{character.traits.misfortune}</div>
+                </div>
               </div>
-              <div className="absolute top-2 right-3 text-[8px] text-stone-300 font-mono">ID: {Math.random().toString(36).substr(2, 9).toUpperCase()}</div>
+              <div className="absolute top-2 right-3 text-[8px] text-stone-300 font-mono">ID: {secureRandom().toString(36).substr(2, 9).toUpperCase()}</div>
             </div>
           </div>
 

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { TRAIT_TABLES, CAREERS, DUNGEONEERING_GEAR, GENERAL_GEAR_1, GENERAL_GEAR_2, SPELLS_DATA, NPC_IDENTITIES, TRAVEL_HAZARDS, WEATHER_CONDITIONS_2D6, TRAVEL_EVENTS } from '../constants';
 import { Dices, Plus, Trash2, Settings, List } from 'lucide-react';
+import { secureRandom } from '../utils';
 
 // Registry of all random tables
 const TABLES_REGISTRY = [
@@ -56,7 +57,7 @@ const DmTablesBlock: React.FC = () => {
             if (table) {
                 const rolledItems = [];
                 for (let i = 0; i < req.count; i++) {
-                    rolledItems.push(table.items[Math.floor(Math.random() * table.items.length)]);
+                    rolledItems.push(table.items[Math.floor(secureRandom() * table.items.length)]);
                 }
                 newResults.push({ tableName: table.name, rolled: rolledItems });
             }

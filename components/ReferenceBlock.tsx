@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { SPELLS_DATA, ITEM_PRICES, MAGIC_RULES, TRAIT_TABLES, DUNGEONEERING_GEAR, GENERAL_GEAR_1, GENERAL_GEAR_2, CAREERS } from '../constants';
 import { Search, ScrollText, Coins, Sparkles, Book, ShieldAlert, Dices } from 'lucide-react';
+import { secureRandom, pick } from '../utils';
 
 const ReferenceBlock: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'spells' | 'items' | 'tables'>('spells');
@@ -10,7 +11,7 @@ const ReferenceBlock: React.FC = () => {
   const filteredSpells = SPELLS_DATA.filter(s => s.name.toLowerCase().includes(filter.toLowerCase()));
 
   const rollRandomSpell = () => {
-    const spell = SPELLS_DATA[Math.floor(Math.random() * SPELLS_DATA.length)];
+    const spell = pick(SPELLS_DATA);
     setRandomResult(`🎲 你掷出了随机法术: ${spell.name} - ${spell.desc}`);
   };
 
@@ -182,7 +183,7 @@ const ReferenceBlock: React.FC = () => {
                           <span className="font-bold text-sm tracking-wide text-stone-800">{record.name}</span>
                           <button
                             onClick={() => {
-                              const result = record.items[Math.floor(Math.random() * record.items.length)];
+                              const result = pick(record.items);
                               setRandomResult(`🎲 [${record.name}] 随机结果: ${result}`);
                             }}
                             className="text-amber-700 hover:text-amber-900 hover:bg-amber-200/50 p-1 rounded transition-colors"

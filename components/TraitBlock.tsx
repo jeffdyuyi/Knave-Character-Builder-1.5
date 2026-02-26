@@ -1,7 +1,8 @@
 import React from 'react';
 import { Traits } from '../types';
 import { Shuffle } from 'lucide-react';
-import { CAREERS } from '../constants';
+import { CAREERS } from '../data';
+import { secureRandom } from '../utils';
 
 interface TraitBlockProps {
   traits: Traits;
@@ -29,7 +30,7 @@ const TraitBlock: React.FC<TraitBlockProps> = ({ traits, onRandomize, onBackgrou
             <span className="text-xs font-bold text-stone-500 uppercase tracking-wider">背景 Background</span>
             <button
               onClick={() => {
-                const randomCareer = CAREERS[Math.floor(Math.random() * CAREERS.length)].name;
+                const randomCareer = CAREERS[Math.floor(secureRandom() * CAREERS.length)].name;
                 onBackgroundChange(randomCareer);
               }}
               className="text-amber-700 hover:text-amber-900 bg-amber-100 hover:bg-amber-200 px-2 py-0.5 rounded text-[10px] font-bold flex items-center gap-1 transition-colors"

@@ -1,8 +1,15 @@
 import { v4 as uuidv4 } from 'uuid';
 import { Item, Stat, StatName } from './types';
 
+// Cryptographically secure pseudorandom number generator replacing Math.random()
+export const secureRandom = () => {
+  const array = new Uint32Array(1);
+  window.crypto.getRandomValues(array);
+  return array[0] / (0xffffffff + 1);
+};
+
 // Dice functions
-export const d = (sides: number) => Math.floor(Math.random() * sides) + 1;
+export const d = (sides: number) => Math.floor(secureRandom() * sides) + 1;
 export const d6 = () => d(6);
 export const d8 = () => d(8);
 export const d20 = () => d(20);
@@ -21,7 +28,7 @@ export const getStatByDice = (roll: number): StatName => {
 };
 
 // Array picker
-export const pick = <T>(arr: T[]): T => arr[Math.floor(Math.random() * arr.length)];
+export const pick = <T>(arr: T[]): T => arr[Math.floor(secureRandom() * arr.length)];
 
 // ID generator
 export const generateId = () => uuidv4();
