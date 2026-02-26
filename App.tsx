@@ -148,7 +148,7 @@ const App: React.FC = () => {
       }
     });
     setCharacter(prev => ({ ...prev, stats: newStats }));
-  }, []);
+  }, [setCharacter]);
 
   const adjustStat = useCallback((statName: StatName, amount: number) => {
     setCharacter(prev => {
@@ -163,7 +163,7 @@ const App: React.FC = () => {
         }
       };
     });
-  }, []);
+  }, [setCharacter]);
 
   const rerollHp = useCallback(() => {
     // Roll HP based on level: Level d6
@@ -175,7 +175,7 @@ const App: React.FC = () => {
       }
       return { ...prev, hp: { current: total, max: total } };
     });
-  }, []);
+  }, [setCharacter]);
 
   const randomizeTraits = useCallback(() => {
     const randomCareer = pick(CAREERS);
@@ -192,7 +192,7 @@ const App: React.FC = () => {
         inventory: [...prev.inventory, ...careerItems]
       };
     });
-  }, []);
+  }, [setCharacter]);
 
   const handleBackgroundChange = useCallback((careerName: string) => {
     setCharacter(prev => {
@@ -211,7 +211,7 @@ const App: React.FC = () => {
         inventory: newInventory
       };
     });
-  }, []);
+  }, [setCharacter]);
 
   const generateStartingGear = useCallback(() => {
     const newInventory: Item[] = [];
@@ -262,22 +262,22 @@ const App: React.FC = () => {
         inventory: inventoryWithSpells
       };
     });
-  }, []);
+  }, [setCharacter]);
 
   const addItem = useCallback((item: Item) => {
     setCharacter(prev => ({ ...prev, inventory: [...prev.inventory, item] }));
-  }, []);
+  }, [setCharacter]);
 
   const removeItem = useCallback((id: string) => {
     setCharacter(prev => ({ ...prev, inventory: prev.inventory.filter(i => i.id !== id) }));
-  }, []);
+  }, [setCharacter]);
 
   const updateItem = useCallback((id: string, updates: Partial<Item>) => {
     setCharacter(prev => ({
       ...prev,
       inventory: prev.inventory.map(item => item.id === id ? { ...item, ...updates } : item)
     }));
-  }, []);
+  }, [setCharacter]);
 
   const handleXpChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const val = e.target.value;
@@ -285,7 +285,7 @@ const App: React.FC = () => {
     // Knave rules: usually 1000 XP per level.
     const level = Math.floor(xp / 1000) + 1;
     setCharacter(prev => ({ ...prev, xp, level }));
-  }, []);
+  }, [setCharacter]);
 
   const handleLevelChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const val = e.target.value;
@@ -293,13 +293,13 @@ const App: React.FC = () => {
     // Sync XP to minimum for that level
     const xp = (level - 1) * 1000;
     setCharacter(prev => ({ ...prev, level, xp }));
-  }, []);
+  }, [setCharacter]);
 
   const handleMaxHpChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const val = e.target.value;
     const max = val === '' ? 1 : Math.max(1, parseInt(val) || 1);
     setCharacter(prev => ({ ...prev, hp: { ...prev.hp, max, current: prev.hp.current > max ? max : prev.hp.current } }));
-  }, []);
+  }, [setCharacter]);
 
   if (viewMode === 'sheet') {
     return <CharacterSheet character={character} onEdit={() => setViewMode('edit')} />;

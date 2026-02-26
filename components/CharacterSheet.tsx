@@ -347,7 +347,7 @@ const CharacterSheet: React.FC<CharacterSheetProps> = ({ character, onEdit }) =>
               <div style={{ border: '2px solid black', flexGrow: 1, height: '62mm', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
                 <div style={{ fontSize: '7px', fontWeight: 'bold', letterSpacing: '1px', padding: '1mm 2mm', borderBottom: '1.5px solid black', flexShrink: 0 }}>PORTRAIT</div>
                 {/* 特征信息 */}
-                <div style={{ padding: '1.5mm 2mm', display: 'grid', gridTemplateColumns: '1fr 1fr', gridTemplateRows: 'repeat(4, 1fr)', gap: '1mm 2mm', flexGrow: 1, overflow: 'hidden' }}>
+                <div style={{ padding: '1.5mm 2mm', display: 'grid', gridTemplateColumns: '1fr 1fr', gridTemplateRows: 'repeat(5, 1fr)', gap: '1mm 2mm', flexGrow: 1, overflow: 'hidden' }}>
                   {Object.entries(character.traits).filter(([k]) => k !== 'background').map(([k, v]) => (
                     <div key={k} style={{ borderBottom: '0.5px solid #ccc', paddingBottom: '1mm', overflow: 'hidden' }}>
                       <div style={{ fontSize: '6px', fontWeight: 'bold', color: '#666', textTransform: 'uppercase', lineHeight: 1 }}>{TRAIT_LABELS[k]?.split(' ')[0] || k}</div>
