@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { TRAIT_TABLES, CAREERS, DUNGEONEERING_GEAR, GENERAL_GEAR_1, GENERAL_GEAR_2, SPELLS_DATA, NPC_IDENTITIES, TRAVEL_HAZARDS, WEATHER_CONDITIONS_2D6, TRAVEL_EVENTS, ENVIRONMENT_SIGNS, ENVIRONMENT_LOCATIONS, ENVIRONMENT_STRUCTURES, LOCATION_TRAITS, EXPLORATION_EVENTS, DUNGEON_ROOMS, ROOM_DETAILS, ROOM_THEMES, DUNGEON_TYPES, TRAP_EFFECTS, HAZARDS, ACTIVITIES, NPC_REACTIONS_2D6, MECHANISMS, SPELL_FORMULAS, WIZARD_NAMES, SPELL_QUALITIES, SPELL_EFFECTS, SPELL_ELEMENTS, SPELL_FORMS, MAGIC_SCHOOLS, DOMAINS, POTIONS, SYMBOLS, TEXTURES, TASTES, COLORS, INGREDIENTS, TOOLS, MISCELLANEOUS, BOOKS, CLOTHING, FABRICS, DECORATIONS, TREASURES, MATERIALS, ITEM_TRAITS, WEAPONS, CITY_THEMES, CITY_EVENTS, STREET_DETAILS, BUILDINGS, INN_NAMES_1, INN_NAMES_2, FOOD_TRAITS, FOODS, FACTIONS, FACTION_TRAITS, MISSIONS, REWARDS, ARCHETYPES, PERSONALITIES, NPC_DETAILS, GOALS, ADVANTAGES, DISADVANTAGES, RELATIONSHIPS, MANNERISMS, MONSTERS, ANIMALS, MONSTER_TRAITS, MONSTER_FEATURES, MONSTER_ABILITIES, MONSTER_TACTICS, MONSTER_WEAKNESSES, MALE_NAMES, FEMALE_NAMES, SURNAMES_1, SURNAMES_2, CAROUSING_MISHAPS } from '../data';
-import { Dices, Plus, Trash2, Settings, List, Search, BookOpen, ChevronDown, ChevronRight } from 'lucide-react';
+import { Dices, Plus, Trash2, Settings, List, Search, BookOpen, ChevronDown, ChevronRight, AlertTriangle } from 'lucide-react';
 import { secureRandom, pick } from '../utils';
 
 // ─── 随机表注册表（带分组） ───────────────────────────────────────────────────
@@ -294,7 +294,7 @@ const TableBrowser: React.FC = () => {
 // ─── 主组件 ───────────────────────────────────────────────────────────────────
 
 const DmTablesBlock: React.FC = () => {
-    const [activeTab, setActiveTab] = useState<'roller' | 'browser'>('roller');
+    const [activeTab, setActiveTab] = useState<'roller' | 'browser' | 'hazards'>('roller');
     const [requests, setRequests] = useState<RollRequest[]>([
         { id: crypto.randomUUID(), tableId: 'npc_ident', count: 1 }
     ]);
@@ -365,6 +365,13 @@ const DmTablesBlock: React.FC = () => {
                         ${activeTab === 'browser' ? 'bg-white text-stone-900 border-b-2 border-white -mb-[2px]' : 'text-stone-500 hover:bg-stone-200'}`}
                 >
                     <BookOpen size={18} /> 浏览随机表
+                </button>
+                <button
+                    onClick={() => setActiveTab('hazards')}
+                    className={`flex-1 py-3 px-4 font-bold font-serif text-sm sm:text-base flex items-center justify-center gap-2 transition-colors
+                        ${activeTab === 'hazards' ? 'bg-white text-stone-900 border-b-2 border-white -mb-[2px]' : 'text-stone-500 hover:bg-stone-200'}`}
+                >
+                    <AlertTriangle size={18} /> 危险参考
                 </button>
             </div>
 
@@ -490,9 +497,99 @@ const DmTablesBlock: React.FC = () => {
                             </div>
                         </div>
                     </div>
-                ) : (
+                ) : activeTab === 'browser' ? (
                     <div className="p-6">
                         <TableBrowser />
+                    </div>
+                ) : (
+                    /* ── 危险参考 ── */
+                    <div className="p-6">
+                        <p className="text-sm text-stone-500 italic mb-5">以下规则适用于在探险中遭遇的各类自然与环境危险。</p>
+                        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+
+                            {/* 火焰 */}
+                            <div className="bg-red-50 border border-red-200 rounded p-4">
+                                <h4 className="font-bold text-base mb-2 text-red-900 flex items-center gap-2">
+                                    <AlertTriangle size={15} className="text-red-600" /> 火焰 (Fire)
+                                </h4>
+                                <ul className="text-sm space-y-1.5 text-stone-700">
+                                    <li><span className="font-bold">火焰：</span>每轮 <span className="font-bold text-red-700">1d6</span> 点直接伤害。</li>
+                                    <li><span className="font-bold">着火：</span>每轮 <span className="font-bold text-red-700">2d6</span> 点直接伤害。</li>
+                                    <li><span className="font-bold">浸入熔岩：</span><span className="font-bold text-red-900">立即死亡</span>。</li>
+                                </ul>
+                            </div>
+
+                            {/* 溺水 */}
+                            <div className="bg-blue-50 border border-blue-200 rounded p-4">
+                                <h4 className="font-bold text-base mb-2 text-blue-900 flex items-center gap-2">
+                                    <AlertTriangle size={15} className="text-blue-600" /> 溺水 (Drowning)
+                                </h4>
+                                <p className="text-sm text-stone-700 leading-relaxed">
+                                    玩家角色可以屏住呼吸 <span className="font-bold">30 秒</span>，体质（CON）每点额外增加 <span className="font-bold">30 秒</span>。此后，他们会<span className="font-bold">昏迷</span>，并且每轮都必须通过一次<span className="font-bold">体质检定</span>，否则<span className="font-bold text-red-700">死亡</span>。
+                                </p>
+                            </div>
+
+                            {/* 冰冻 */}
+                            <div className="bg-sky-50 border border-sky-200 rounded p-4">
+                                <h4 className="font-bold text-base mb-2 text-sky-900 flex items-center gap-2">
+                                    <AlertTriangle size={15} className="text-sky-600" /> 冰冻 (Freezing)
+                                </h4>
+                                <p className="text-sm text-stone-700 leading-relaxed">
+                                    每 <span className="font-bold">10 分钟回合</span>受到 <span className="font-bold text-sky-700">1 点</span>直接伤害，除非玩家角色通过一次<span className="font-bold">体质检定</span>。
+                                </p>
+                            </div>
+
+                            {/* 闪电 */}
+                            <div className="bg-yellow-50 border border-yellow-200 rounded p-4">
+                                <h4 className="font-bold text-base mb-2 text-yellow-900 flex items-center gap-2">
+                                    <AlertTriangle size={15} className="text-yellow-600" /> 闪电 (Lightning)
+                                </h4>
+                                <p className="text-sm text-stone-700 leading-relaxed">
+                                    <span className="font-bold text-yellow-700">3d6</span> 点直接伤害。
+                                </p>
+                            </div>
+
+                            {/* 坠落 */}
+                            <div className="bg-stone-50 border border-stone-300 rounded p-4">
+                                <h4 className="font-bold text-base mb-2 text-stone-900 flex items-center gap-2">
+                                    <AlertTriangle size={15} className="text-stone-600" /> 坠落 (Falling)
+                                </h4>
+                                <p className="text-sm text-stone-700 leading-relaxed">
+                                    每坠落 <span className="font-bold">10 英尺</span>受到 <span className="font-bold text-stone-700">1d6</span> 点直接伤害。如果至少有<span className="font-bold">三个骰子掷出 6</span>，则玩家角色<span className="font-bold text-red-700">立即死亡</span>。
+                                </p>
+                            </div>
+
+                            {/* 干渴 */}
+                            <div className="bg-amber-50 border border-amber-200 rounded p-4">
+                                <h4 className="font-bold text-base mb-2 text-amber-900 flex items-center gap-2">
+                                    <AlertTriangle size={15} className="text-amber-600" /> 干渴 (Thirst)
+                                </h4>
+                                <p className="text-sm text-stone-700 leading-relaxed">
+                                    每天没有饮水，所有检定都会受到 <span className="font-bold text-red-700">-5 的罚值</span>。三天后，每天必须通过一次<span className="font-bold">体质检定</span>，否则<span className="font-bold text-red-700">死亡</span>。除非身处非常干旱的环境，否则假定玩家角色在旅行时能找到饮用水。
+                                </p>
+                            </div>
+
+                            {/* 睡眠剥夺 */}
+                            <div className="bg-indigo-50 border border-indigo-200 rounded p-4">
+                                <h4 className="font-bold text-base mb-2 text-indigo-900 flex items-center gap-2">
+                                    <AlertTriangle size={15} className="text-indigo-600" /> 睡眠剥夺 (Sleep Deprivation)
+                                </h4>
+                                <p className="text-sm text-stone-700 leading-relaxed">
+                                    每缺乏一天睡眠，所有检定都会受到 <span className="font-bold text-red-700">-5 的罚值</span>。两天后，每个<span className="font-bold">值夜班次</span>都要进行一次<span className="font-bold">感知检定</span>，否则会<span className="font-bold">昏睡三个值夜班次</span>。
+                                </p>
+                            </div>
+
+                            {/* 醉酒 */}
+                            <div className="bg-rose-50 border border-rose-200 rounded p-4">
+                                <h4 className="font-bold text-base mb-2 text-rose-900 flex items-center gap-2">
+                                    <AlertTriangle size={15} className="text-rose-600" /> 醉酒 (Intoxication)
+                                </h4>
+                                <p className="text-sm text-stone-700 leading-relaxed">
+                                    玩家角色每饮酒一小时，便进行一次<span className="font-bold">体质检定</span>。如果失败，他们会醉酒，并且所有检定在第二天之前都会受到 <span className="font-bold text-red-700">-5 的罚值</span>。如果一个生物连续两小时未能通过体质检定，他们会<span className="font-bold">昏睡两个值夜班次（8 小时）</span>。
+                                </p>
+                            </div>
+
+                        </div>
                     </div>
                 )}
             </div>

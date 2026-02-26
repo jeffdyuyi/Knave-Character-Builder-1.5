@@ -32,7 +32,7 @@ const ReferenceBlock: React.FC = () => {
             ${activeTab === 'spells' ? 'bg-white text-stone-900 border-b-2 border-white -mb-[2px]' : 'text-stone-500 hover:bg-stone-200'}`}
         >
           <ScrollText size={20} />
-          100无等级法术
+          无等级法术
         </button>
         <button
           onClick={() => setActiveTab('items')}
@@ -68,6 +68,21 @@ const ReferenceBlock: React.FC = () => {
           )}
         </div>
       </div>
+      {/* 随机法术结果：按钮之下、规则之上 */}
+      {randomSpell && activeTab === 'spells' && (
+        <div className="px-4 pb-3 pt-2 bg-stone-50 border-b border-stone-200">
+          <div className="p-3 bg-amber-50 border-2 border-amber-400 rounded shadow-sm">
+            <div className="flex items-center justify-between mb-1">
+              <span className="text-xs font-bold text-amber-600 uppercase tracking-wider flex items-center gap-1">
+                <Dices size={12} /> 随机法术结果
+              </span>
+              <button onClick={() => setRandomSpell(null)} className="text-amber-400 hover:text-amber-700 text-xs font-bold">✕ 关闭</button>
+            </div>
+            <div className="font-serif font-bold text-stone-900 text-lg">{randomSpell.name}</div>
+            <p className="text-sm text-stone-700 mt-1 leading-snug">{randomSpell.desc}</p>
+          </div>
+        </div>
+      )}
 
       {/* Content */}
       <div className="p-4 bg-white">
@@ -95,21 +110,6 @@ const ReferenceBlock: React.FC = () => {
               </div>
             )}
 
-            {/* Spells List */}
-            {/* 随机法术结果卡片 */}
-            {randomSpell && (
-              <div className="mb-4 p-4 bg-amber-50 border-2 border-amber-400 rounded shadow-sm">
-                <div className="flex items-center justify-between mb-1">
-                  <span className="text-xs font-bold text-amber-600 uppercase tracking-wider flex items-center gap-1">
-                    <Dices size={12} /> 随机法术结果
-                  </span>
-                  <button onClick={() => setRandomSpell(null)} className="text-amber-400 hover:text-amber-700 text-xs font-bold">✕ 关闭</button>
-                </div>
-                <div className="font-serif font-bold text-stone-900 text-lg">{randomSpell.name}</div>
-                <p className="text-sm text-stone-700 mt-1 leading-snug">{randomSpell.desc}</p>
-              </div>
-            )}
-
             {/* 法术列表 */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
               {filteredSpells.length > 0 ? (
@@ -117,8 +117,8 @@ const ReferenceBlock: React.FC = () => {
                   <div
                     key={idx}
                     className={`group relative p-3 border rounded transition-colors ${randomSpell?.name === spell.name
-                        ? 'border-amber-400 bg-amber-50 ring-2 ring-amber-300'
-                        : 'border-stone-200 hover:bg-stone-50 hover:border-stone-400'
+                      ? 'border-amber-400 bg-amber-50 ring-2 ring-amber-300'
+                      : 'border-stone-200 hover:bg-stone-50 hover:border-stone-400'
                       }`}
                   >
                     <div className="flex gap-2 items-baseline mb-1">
