@@ -1,18 +1,45 @@
 import React, { useState } from 'react';
-import { TRAIT_TABLES, CAREERS, DUNGEONEERING_GEAR, GENERAL_GEAR_1, GENERAL_GEAR_2, SPELLS_DATA, NPC_IDENTITIES, TRAVEL_HAZARDS, WEATHER_CONDITIONS_2D6, TRAVEL_EVENTS, ENVIRONMENT_SIGNS, ENVIRONMENT_LOCATIONS, ENVIRONMENT_STRUCTURES, LOCATION_TRAITS, EXPLORATION_EVENTS, DUNGEON_ROOMS, ROOM_DETAILS } from '../data';
+import { TRAIT_TABLES, CAREERS, DUNGEONEERING_GEAR, GENERAL_GEAR_1, GENERAL_GEAR_2, SPELLS_DATA, NPC_IDENTITIES, TRAVEL_HAZARDS, WEATHER_CONDITIONS_2D6, TRAVEL_EVENTS, ENVIRONMENT_SIGNS, ENVIRONMENT_LOCATIONS, ENVIRONMENT_STRUCTURES, LOCATION_TRAITS, EXPLORATION_EVENTS, DUNGEON_ROOMS, ROOM_DETAILS, ROOM_THEMES, DUNGEON_TYPES, TRAP_EFFECTS, HAZARDS, ACTIVITIES, NPC_REACTIONS_2D6, MECHANISMS, SPELL_FORMULAS, WIZARD_NAMES, SPELL_QUALITIES, SPELL_EFFECTS, SPELL_ELEMENTS, SPELL_FORMS, MAGIC_SCHOOLS, DOMAINS, POTIONS, SYMBOLS, TEXTURES, TASTES, COLORS, INGREDIENTS, TOOLS, MISCELLANEOUS, BOOKS, CLOTHING, FABRICS, DECORATIONS } from '../data';
 import { Dices, Plus, Trash2, Settings, List } from 'lucide-react';
 import { secureRandom } from '../utils';
 
 // Registry of all random tables
 const TABLES_REGISTRY = [
     { id: 'npc_ident', name: 'NPC 社会身份 (d100)', items: NPC_IDENTITIES },
+    { id: 'npc_reactions', name: 'NPC 反应与初始态度 (2d6)', items: NPC_REACTIONS_2D6 },
+    { id: 'activities', name: '活动与行为状态 (d100)', items: ACTIVITIES },
+    { id: 'spell_formulas', name: '法术命名公式 (d12)', items: SPELL_FORMULAS },
+    { id: 'wizard_names', name: '巫师名讳 (d100)', items: WIZARD_NAMES },
+    { id: 'spell_qualities', name: '法术品质/修饰词 (d100)', items: SPELL_QUALITIES },
+    { id: 'potions', name: '炼金药水效果 (d100)', items: POTIONS },
+    { id: 'tools', name: '工具/冒险实用品 (d100)', items: TOOLS },
+    { id: 'miscellaneous', name: '杂项物品/风味小件 (d100)', items: MISCELLANEOUS },
+    { id: 'books', name: '书籍文献/阅读主题 (d100)', items: BOOKS },
+    { id: 'clothing', name: '衣物款式/护甲部件 (d100)', items: CLOTHING },
+    { id: 'fabrics', name: '布料/物品材质 (d100)', items: FABRICS },
+    { id: 'decorations', name: '修饰与风格外观 (d100)', items: DECORATIONS },
+    { id: 'symbols', name: '符号/徽章与印记 (d100)', items: SYMBOLS },
+    { id: 'textures', name: '质感与触感 (d100)', items: TEXTURES },
+    { id: 'tastes', name: '味觉与味道 (d100)', items: TASTES },
+    { id: 'colors', name: '颜色与色调 (d100)', items: COLORS },
+    { id: 'ingredients', name: '仪式魔法/炼金原料 (d100)', items: INGREDIENTS },
+    { id: 'spell_effects', name: '法术效果/动词 (d100)', items: SPELL_EFFECTS },
+    { id: 'spell_elements', name: '法术元素/基础 (d100)', items: SPELL_ELEMENTS },
+    { id: 'spell_forms', name: '法术形态/表现 (d100)', items: SPELL_FORMS },
+    { id: 'magic_schools', name: '魔法学派/体系 (d100)', items: MAGIC_SCHOOLS },
+    { id: 'domains', name: '神祇/魔法领域 (d100)', items: DOMAINS },
     { id: 'env_signs', name: '环境危险迹象/前兆 (d100)', items: ENVIRONMENT_SIGNS },
     { id: 'env_locations', name: '自然地貌与地点 (d100)', items: ENVIRONMENT_LOCATIONS },
     { id: 'env_structures', name: '人造构筑与废墟 (d100)', items: ENVIRONMENT_STRUCTURES },
+    { id: 'dungeon_types', name: '地下城类别与性质 (d100)', items: DUNGEON_TYPES },
     { id: 'loc_traits', name: '地点特性与氛围 (d100)', items: LOCATION_TRAITS },
     { id: 'explore_events', name: '地下城探索变动 (d100)', items: EXPLORATION_EVENTS },
     { id: 'dungeon_rooms', name: '房间分区 (d100)', items: DUNGEON_ROOMS },
+    { id: 'room_themes', name: '房间主题与氛围 (d100)', items: ROOM_THEMES },
     { id: 'room_details', name: '房间细节与物件 (d100)', items: ROOM_DETAILS },
+    { id: 'mechanisms', name: '机械装置与部件 (d100)', items: MECHANISMS },
+    { id: 'trap_effects', name: '陷阱效果 (d100)', items: TRAP_EFFECTS },
+    { id: 'hazards', name: '环境与陷阱危险物 (d100)', items: HAZARDS },
     { id: 'travel_hazards', name: '旅行危险 (d6)', items: TRAVEL_HAZARDS },
     { id: 'weather', name: '天气与气候变动 (2d6)', items: WEATHER_CONDITIONS_2D6 },
     { id: 'travel_events', name: '旅行环境变动异象 (d100)', items: TRAVEL_EVENTS },
