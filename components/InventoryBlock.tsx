@@ -42,7 +42,7 @@ const InventoryBlock: React.FC<InventoryBlockProps> = ({
       name: newItemName,
       slots: 1,
       type: 'gear',
-      quality: 3
+      quality: 0
     });
     setNewItemName('');
   };
@@ -72,7 +72,7 @@ const InventoryBlock: React.FC<InventoryBlockProps> = ({
       name: parsedName,
       slots: parseInt(foundItem.name.match(/(\d+)栏位/)?.[1] || '1', 10),
       type,
-      quality: parseInt(foundItem.name.match(/(\d+)耐久/)?.[1] || '3', 10),
+      quality: parseInt(foundItem.name.match(/(\d+)耐久/)?.[1] || (type === 'weapon' || type === 'armor' ? '3' : '0'), 10),
       defense: category === '护甲' ? parseInt(foundItem.name.match(/防御\+?(\d+)/)?.[1] || '0', 10) : undefined,
       damage: category === '武器' ? foundItem.name.match(/(d\d+)伤害/)?.[1] : undefined
     });

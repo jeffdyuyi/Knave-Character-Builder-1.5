@@ -43,6 +43,6 @@ export const createItem = (
   name,
   slots,
   type,
-  quality: 3, // Default quality
+  quality: type === 'weapon' || type === 'armor' ? 3 : 0, // Default quality
   ...props
 });
