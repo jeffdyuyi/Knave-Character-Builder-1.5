@@ -369,105 +369,132 @@ const DmTablesBlock: React.FC = () => {
                 </button>
             </div>
 
-            <div className="p-6 flex flex-col gap-6 flex-grow">
+            <div className="p-0 flex flex-col flex-grow">
                 {activeTab === 'roller' ? (
-                    <>
-                        {/* Roller config */}
-                        <div className="bg-stone-50 border border-stone-200 p-4 rounded-sm shadow-sm space-y-4">
-                            <div className="flex justify-between items-center border-b border-stone-200 pb-2">
-                                <h3 className="font-bold text-lg font-serif flex items-center gap-2">
-                                    <Settings size={20} className="text-amber-700" />
-                                    配置生成项 (Roll Config)
+                    /* ── 左右双列布局 ── */
+                    <div className="flex flex-row items-stretch flex-grow min-h-[520px]">
+
+                        {/* ── 左列：配置区 ── */}
+                        <div className="w-5/12 shrink-0 flex flex-col border-r-2 border-stone-200 bg-stone-50">
+                            {/* 列标题 */}
+                            <div className="flex items-center justify-between px-5 py-3 border-b border-stone-200 bg-stone-100">
+                                <h3 className="font-bold font-serif flex items-center gap-2 text-stone-800">
+                                    <Settings size={16} className="text-amber-700" />
+                                    配置生成项
                                 </h3>
                                 <button
                                     onClick={handleAddRequest}
-                                    className="flex items-center gap-1 text-sm bg-stone-200 hover:bg-stone-300 text-stone-800 px-3 py-1 font-bold rounded transition-colors"
+                                    className="flex items-center gap-1 text-xs bg-stone-200 hover:bg-stone-300 text-stone-700 px-2.5 py-1 font-bold rounded transition-colors"
                                 >
-                                    <Plus size={16} /> 添加随机表
+                                    <Plus size={14} /> 添加表格
                                 </button>
                             </div>
 
-                            <div className="space-y-3">
+                            {/* 表格列表（可滚动） */}
+                            <div className="flex-grow overflow-y-auto px-4 py-3 space-y-2">
                                 {requests.map((req, index) => (
-                                    <div key={req.id} className="flex flex-col sm:flex-row gap-3 items-center bg-white p-3 border border-stone-200 rounded">
-                                        <span className="font-mono text-stone-400 font-bold shrink-0">{index + 1}.</span>
+                                    <div key={req.id} className="bg-white border border-stone-200 rounded p-2.5 flex flex-col gap-2 shadow-sm">
+                                        {/* 行号 + 删除 */}
+                                        <div className="flex items-center justify-between">
+                                            <span className="font-mono text-stone-300 text-xs font-bold">#{index + 1}</span>
+                                            <button
+                                                onClick={() => handleRemoveRequest(req.id)}
+                                                className="text-stone-300 hover:text-red-500 hover:bg-red-50 transition-colors p-0.5 rounded"
+                                                title="移除此项"
+                                                disabled={requests.length <= 1}
+                                            >
+                                                <Trash2 size={14} />
+                                            </button>
+                                        </div>
+                                        {/* 下拉选表 */}
                                         <select
-                                            className="w-full sm:flex-grow border border-stone-300 rounded px-2 py-1.5 focus:border-stone-800 focus:outline-none font-serif font-bold text-stone-700"
+                                            className="w-full border border-stone-200 rounded px-2 py-1.5 text-xs focus:border-stone-600 focus:outline-none font-serif font-bold text-stone-700 bg-stone-50"
                                             value={req.tableId}
                                             onChange={(e) => handleChangeTable(req.id, e.target.value)}
                                         >
                                             {groupedOptions}
                                         </select>
-
-                                        <div className="w-full sm:w-auto flex items-center justify-between sm:justify-start gap-3 pl-0 sm:pl-4 border-l-0 sm:border-l border-stone-200">
-                                            <div className="flex items-center gap-2">
-                                                <span className="text-xs font-bold text-stone-500 uppercase">数量:</span>
-                                                <input
-                                                    type="number"
-                                                    min="1" max="50"
-                                                    value={req.count}
-                                                    onChange={(e) => handleChangeCount(req.id, parseInt(e.target.value) || 1)}
-                                                    className="w-16 border border-stone-300 text-center rounded py-1 focus:border-stone-800 focus:outline-none font-bold text-stone-800"
-                                                />
-                                            </div>
-
-                                            <button
-                                                onClick={() => handleRemoveRequest(req.id)}
-                                                className="text-stone-400 hover:text-red-500 hover:bg-red-50 transition-colors p-1 rounded"
-                                                title="移除此项"
-                                                disabled={requests.length <= 1}
-                                            >
-                                                <Trash2 size={20} />
-                                            </button>
+                                        {/* 数量 */}
+                                        <div className="flex items-center gap-2">
+                                            <span className="text-[10px] font-bold text-stone-400 uppercase tracking-wider">数量:</span>
+                                            <input
+                                                type="number"
+                                                min="1" max="50"
+                                                value={req.count}
+                                                onChange={(e) => handleChangeCount(req.id, parseInt(e.target.value) || 1)}
+                                                className="w-14 border border-stone-200 text-center rounded py-0.5 text-sm focus:border-stone-600 focus:outline-none font-bold text-stone-800"
+                                            />
                                         </div>
                                     </div>
                                 ))}
                             </div>
 
-                            <div className="pt-2 flex pl-1">
-                                <span className="text-stone-400 text-xs italic">
-                                    您可以自由组合不同随机表，并一次性投掷生成所需内容。如果需要创建大量杂兵NPC、或配置战利品堆，这也是非常方便的。
-                                </span>
-                            </div>
-
-                            <div className="pt-4 border-t border-stone-200">
+                            {/* 提示文字 + 摇骰按钮（固定在底部） */}
+                            <div className="px-4 pb-4 pt-2 border-t border-stone-200 flex flex-col gap-2 shrink-0">
+                                <p className="text-stone-400 text-[10px] italic leading-relaxed">
+                                    自由组合随机表，一次性生成 NPC、战利品、地点等所需内容。
+                                </p>
                                 <button
                                     onClick={handleRollAll}
-                                    className="w-full bg-amber-700 hover:bg-amber-800 text-white font-bold py-3 rounded shadow hover:shadow-md transition-all flex justify-center items-center gap-2 text-lg"
+                                    className="w-full bg-amber-700 hover:bg-amber-800 active:bg-amber-900 text-white font-bold py-2.5 rounded shadow hover:shadow-md transition-all flex justify-center items-center gap-2"
                                 >
-                                    <Dices size={24} /> 摇骰生成 (Roll Selected)
+                                    <Dices size={20} /> 摇骰生成
                                 </button>
                             </div>
                         </div>
 
-                        {/* Results */}
-                        {results && (
-                            <div className="border-t-2 border-stone-800 pt-6">
-                                <h3 className="font-black text-2xl font-serif mb-4 flex items-center gap-2 text-stone-900 border-b pb-2">
-                                    <List size={24} /> 生成结果
+                        {/* ── 右列：结果区 ── */}
+                        <div className="flex-1 flex flex-col bg-white">
+                            {/* 列标题 */}
+                            <div className="flex items-center justify-between px-5 py-3 border-b border-stone-200 bg-stone-50 shrink-0">
+                                <h3 className="font-bold font-serif flex items-center gap-2 text-stone-800">
+                                    <List size={16} className="text-amber-700" />
+                                    生成结果
                                 </h3>
-                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                                    {results.map((res, rIdx) => (
-                                        <div key={rIdx} className="border border-stone-300 rounded overflow-hidden shadow-sm bg-white flex flex-col h-fit">
-                                            <div className="bg-stone-200 px-3 py-2 font-bold font-serif text-stone-800 border-b border-stone-300">
-                                                {res.tableName}
-                                            </div>
-                                            <ul className="divide-y divide-stone-100 p-0 text-sm flex-grow">
-                                                {res.rolled.map((item, iIdx) => (
-                                                    <li key={iIdx} className="px-3 py-2 hover:bg-amber-50 flex items-start gap-2">
-                                                        <span className="text-stone-400 font-mono text-[10px] font-bold w-4 shrink-0 pt-0.5">{iIdx + 1}.</span>
-                                                        <span className="text-stone-800 font-serif leading-tight">{item}</span>
-                                                    </li>
-                                                ))}
-                                            </ul>
-                                        </div>
-                                    ))}
-                                </div>
+                                {results && (
+                                    <button
+                                        onClick={() => setResults(null)}
+                                        className="text-xs text-stone-400 hover:text-stone-600 transition-colors font-bold"
+                                    >
+                                        清空
+                                    </button>
+                                )}
                             </div>
-                        )}
-                    </>
+
+                            {/* 结果内容（可滚动） */}
+                            <div className="flex-grow overflow-y-auto p-4">
+                                {results ? (
+                                    <div className="grid grid-cols-1 xl:grid-cols-2 gap-3">
+                                        {results.map((res, rIdx) => (
+                                            <div key={rIdx} className="border border-stone-200 rounded overflow-hidden shadow-sm bg-white flex flex-col">
+                                                <div className="bg-stone-100 px-3 py-2 font-bold font-serif text-stone-700 text-xs border-b border-stone-200">
+                                                    {res.tableName}
+                                                </div>
+                                                <ul className="divide-y divide-stone-100 text-sm flex-grow">
+                                                    {res.rolled.map((item, iIdx) => (
+                                                        <li key={iIdx} className="px-3 py-2 hover:bg-amber-50 flex items-start gap-2 transition-colors">
+                                                            <span className="text-stone-300 font-mono text-[10px] font-bold w-4 shrink-0 pt-0.5">{iIdx + 1}.</span>
+                                                            <span className="text-stone-800 font-serif leading-snug">{item}</span>
+                                                        </li>
+                                                    ))}
+                                                </ul>
+                                            </div>
+                                        ))}
+                                    </div>
+                                ) : (
+                                    /* 空状态 */
+                                    <div className="h-full flex flex-col items-center justify-center text-stone-300 gap-3 select-none">
+                                        <Dices size={48} strokeWidth={1} />
+                                        <p className="font-serif text-sm">在左侧选择随机表，点击「摇骰生成」</p>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                    </div>
                 ) : (
-                    <TableBrowser />
+                    <div className="p-6">
+                        <TableBrowser />
+                    </div>
                 )}
             </div>
         </div>
