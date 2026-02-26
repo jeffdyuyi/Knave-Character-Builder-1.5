@@ -340,11 +340,7 @@ const CharacterSheet: React.FC<CharacterSheetProps> = ({ character, onEdit }) =>
                   <div style={{ fontSize: '18px', fontWeight: 'bold', lineHeight: 1.1 }}>{character.hp.max}</div>
                 </div>
                 {/* HP 竖向书签 */}
-                <div style={{ border: '2px solid black', width: '10mm', height: '44mm', display: 'flex', flexDirection: 'column' }}>
-                  <div style={{ fontSize: '7px', fontWeight: 'bold', textAlign: 'center', padding: '1mm', borderBottom: '1px solid black', writingMode: 'vertical-rl', transform: 'rotate(180deg)', alignSelf: 'stretch', display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%' }}>
-                    HP
-                  </div>
-                </div>
+                <div style={{ border: '2px solid black', width: '10mm', height: '44mm' }} />
               </div>
 
               {/* PORTRAIT 大框 */}
