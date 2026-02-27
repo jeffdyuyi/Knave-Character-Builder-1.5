@@ -629,6 +629,80 @@ const GameRulesBlock: React.FC = () => {
           </div>
         </section>
 
+        {/* 10. 休整期活动 (Downtime Activities) */}
+        <section className="mb-8">
+          <div className="flex items-center gap-2 border-b-2 border-stone-800 pb-2 mb-4">
+            <Book className="text-stone-900" size={24} />
+            <h3 className="text-2xl font-bold">休整期与城镇活动 (Downtime & Town Activities)</h3>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+
+            {/* 赌博 */}
+            <div className="bg-amber-50 border border-amber-200 rounded p-4">
+              <h4 className="font-bold text-base mb-2 flex items-center gap-2 text-amber-900">
+                <Dices size={16} /> 赌博 (Gambling)
+              </h4>
+              <p className="text-sm leading-relaxed text-stone-700">
+                玩家下注一些钱（不超过赌场上限），然后游戏主持人掷一个 <span className="font-bold">d6</span>。
+                玩家随后做出选择；要么<span className="font-bold">退出并损失一半赌注</span>，要么<span className="font-bold">尝试掷一个 d6</span>，点数要<span className="font-bold text-amber-700">高于</span>游戏主持人的掷骰结果。
+                如果他们掷骰并成功，他们将赢<span className="font-bold text-amber-700">双倍</span>的赌金。如果失败，他们将<span className="font-bold text-red-700">输掉全部</span>赌注。
+              </p>
+            </div>
+
+            {/* 职业培训 */}
+            <div className="bg-blue-50 border border-blue-200 rounded p-4 col-span-1 lg:col-span-2">
+              <h4 className="font-bold text-base mb-2 flex items-center gap-2 text-blue-900">
+                <Book size={16} /> 职业培训 (Career Training)
+              </h4>
+              <p className="text-sm leading-relaxed text-stone-700 mb-3">
+                要获得一个新职业，玩家角色必须找到他们希望学习领域的<span className="font-bold">专家</span>，并花费所需的时间和金钱。
+                获得一个职业能让玩家角色获得与职业相关的<span className="font-bold">知识</span>、尝试相关任务的能力，以及在相关的非战斗检定中获得<span className="font-bold text-blue-700">+5 加值</span>。
+              </p>
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-sm text-stone-600">
+                {/* 常见职业 */}
+                <div className="bg-white border border-blue-100 rounded p-3">
+                  <div className="font-bold text-blue-900 mb-2 flex flex-col xl:flex-row xl:items-center justify-between gap-1">
+                    <span>常见职业 (Common)</span>
+                    <span className="text-[10px] font-mono bg-blue-100 px-1.5 py-0.5 rounded text-center">1 个月 · 1000c</span>
+                  </div>
+                  <p className="text-xs leading-relaxed">
+                    需要 <span className="font-bold">1 个月</span>和 <span className="font-bold">1000c</span>。<br />
+                    <br />
+                    <span className="text-stone-500 italic block border-t border-stone-100 pt-1 mt-1">示例：木匠、猎人、渔夫、水手、染匠、园丁、铁匠等。</span>
+                  </p>
+                </div>
+
+                {/* 非常见职业 */}
+                <div className="bg-white border border-blue-100 rounded p-3">
+                  <div className="font-bold text-purple-900 mb-2 flex flex-col xl:flex-row xl:items-center justify-between gap-1">
+                    <span>非常见职业 (Uncommon)</span>
+                    <span className="text-[10px] font-mono bg-purple-100 px-1.5 py-0.5 rounded text-center">最多 6 个月 · 10,000c</span>
+                  </div>
+                  <p className="text-xs leading-relaxed">
+                    需要 <span className="font-bold">3 个月</span>和 <span className="font-bold">5000c</span> 来尝试相关任务，<span className="font-bold">额外</span>需要 <span className="font-bold">3 个月</span>和 <span className="font-bold">5000c</span> 才能在相关的非战斗检定中获得 +5 加值。<br />
+                    <span className="text-stone-500 italic block border-t border-stone-100 pt-1 mt-1">示例：窃贼、杂技演员、锁匠、盗墓者、草药师、纹身师、探矿者等。</span>
+                  </p>
+                </div>
+
+                {/* 稀有职业 */}
+                <div className="bg-white border border-blue-100 rounded p-3">
+                  <div className="font-bold text-amber-900 mb-2 flex flex-col xl:flex-row xl:items-center justify-between gap-1">
+                    <span>稀有职业 (Rare)</span>
+                    <span className="text-[10px] font-mono bg-amber-100 px-1.5 py-0.5 rounded text-center">最多 2 年 · 60,000c</span>
+                  </div>
+                  <p className="text-xs leading-relaxed">
+                    需要 <span className="font-bold">1 年</span>和 <span className="font-bold">30,000c</span> 来尝试相关任务，<span className="font-bold">额外</span>需要 <span className="font-bold">1 年</span>和 <span className="font-bold">30,000c</span> 才能在相关的非战斗检定中获得 +5 加值。<br />
+                    <span className="text-stone-500 italic block border-t border-stone-100 pt-1 mt-1">示例：炼金术士、律师、刺客、雕塑家、民间传说学家等。</span>
+                  </p>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </section>
+
       </div>
     </div >
   );
