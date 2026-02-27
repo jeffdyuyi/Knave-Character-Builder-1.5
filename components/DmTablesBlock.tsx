@@ -1,7 +1,8 @@
 import React, { useState, useMemo } from 'react';
 import { TRAIT_TABLES, CAREERS, DUNGEONEERING_GEAR, GENERAL_GEAR_1, GENERAL_GEAR_2, SPELLS_DATA, NPC_IDENTITIES, TRAVEL_HAZARDS, WEATHER_CONDITIONS_2D6, TRAVEL_EVENTS, ENVIRONMENT_SIGNS, ENVIRONMENT_LOCATIONS, ENVIRONMENT_STRUCTURES, LOCATION_TRAITS, EXPLORATION_EVENTS, DUNGEON_ROOMS, ROOM_DETAILS, ROOM_THEMES, DUNGEON_TYPES, TRAP_EFFECTS, HAZARDS, ACTIVITIES, NPC_REACTIONS_2D6, MECHANISMS, SPELL_FORMULAS, WIZARD_NAMES, SPELL_QUALITIES, SPELL_EFFECTS, SPELL_ELEMENTS, SPELL_FORMS, MAGIC_SCHOOLS, DOMAINS, POTIONS, SYMBOLS, TEXTURES, TASTES, COLORS, INGREDIENTS, TOOLS, MISCELLANEOUS, BOOKS, CLOTHING, FABRICS, DECORATIONS, TREASURES, MATERIALS, ITEM_TRAITS, WEAPONS, CITY_THEMES, CITY_EVENTS, STREET_DETAILS, BUILDINGS, INN_NAMES_1, INN_NAMES_2, FOOD_TRAITS, FOODS, FACTIONS, FACTION_TRAITS, MISSIONS, REWARDS, ARCHETYPES, PERSONALITIES, NPC_DETAILS, GOALS, ADVANTAGES, DISADVANTAGES, RELATIONSHIPS, MANNERISMS, MONSTERS, ANIMALS, MONSTER_TRAITS, MONSTER_FEATURES, MONSTER_ABILITIES, MONSTER_TACTICS, MONSTER_WEAKNESSES, MALE_NAMES, FEMALE_NAMES, SURNAMES_1, SURNAMES_2, CAROUSING_MISHAPS } from '../data';
-import { Dices, Plus, Trash2, Settings, List, Search, BookOpen, ChevronDown, ChevronRight, AlertTriangle } from 'lucide-react';
+import { Dices, Plus, Trash2, Settings, List, Search, BookOpen, ChevronDown, ChevronRight, AlertTriangle, Image, FileText } from 'lucide-react';
 import { secureRandom, pick } from '../utils';
+import { toPng } from 'html-to-image';
 
 // ─── 随机表注册表（带分组） ───────────────────────────────────────────────────
 
@@ -176,6 +177,13 @@ interface RollResult {
     rolled: string[];
 }
 
+interface HistoryEntry {
+    id: string;
+    timestamp: number;
+    results: RollResult[];
+    memo: string;
+}
+
 // ─── 子组件：随机表浏览器 ──────────────────────────────────────────────────────
 
 const TableBrowser: React.FC = () => {
@@ -298,7 +306,7 @@ const DmTablesBlock: React.FC = () => {
     const [requests, setRequests] = useState<RollRequest[]>([
         { id: crypto.randomUUID(), tableId: 'npc_ident', count: 1 }
     ]);
-    const [results, setResults] = useState<RollResult[] | null>(null);
+    const [history, setHistory] = useState<HistoryEntry[]>([]);
 
     const handleAddRequest = () => {
         setRequests(prev => [...prev, { id: crypto.randomUUID(), tableId: ALL_TABLES[0].id, count: 1 }]);
@@ -328,7 +336,58 @@ const DmTablesBlock: React.FC = () => {
                 newResults.push({ tableName: table.name, rolled: rolledItems });
             }
         });
-        setResults(newResults);
+        const newEntry: HistoryEntry = {
+            id: crypto.randomUUID(),
+            timestamp: Date.now(),
+            results: newResults,
+            memo: ''
+        };
+        setHistory(prev => [newEntry, ...prev]);
+    };
+
+    const updateMemo = (id: string, memo: string) => {
+        setHistory(prev => prev.map(e => e.id === id ? { ...e, memo } : e));
+    };
+
+    const removeHistoryEntry = (id: string) => {
+        setHistory(prev => prev.filter(e => e.id !== id));
+    };
+
+    const clearHistory = () => {
+        setHistory([]);
+    };
+
+    const exportAsImage = async (elementId: string, title: string) => {
+        const el = document.getElementById(elementId);
+        if (!el) return;
+        try {
+            const dataUrl = await toPng(el, { backgroundColor: '#ffffff', pixelRatio: 2 });
+            const a = document.createElement('a');
+            a.href = dataUrl;
+            a.download = `${title}.png`;
+            a.click();
+        } catch (err) {
+            console.error('Export PNG failed', err);
+        }
+    };
+
+    const exportAsMd = (entry: HistoryEntry) => {
+        let md = `# 随机生成记录 (${new Date(entry.timestamp).toLocaleString()})\n\n`;
+        entry.results.forEach(res => {
+            md += `## ${res.tableName}\n`;
+            res.rolled.forEach((item, idx) => md += `${idx + 1}. ${item}\n`);
+            md += `\n`;
+        });
+        if (entry.memo.trim()) {
+            md += `## 备注与组合\n\n${entry.memo}\n`;
+        }
+        const blob = new Blob([md], { type: 'text/markdown;charset=utf-8' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `生成记录-${entry.id.slice(0, 6)}.md`;
+        a.click();
+        URL.revokeObjectURL(url);
     };
 
     // Build grouped option list for the select
@@ -450,43 +509,80 @@ const DmTablesBlock: React.FC = () => {
                         </div>
 
                         {/* ── 右列：结果区 ── */}
-                        <div className="flex-1 flex flex-col bg-white">
+                        <div className="flex-1 flex flex-col bg-stone-100">
                             {/* 列标题 */}
-                            <div className="flex items-center justify-between px-5 py-3 border-b border-stone-200 bg-stone-50 shrink-0">
+                            <div className="flex items-center justify-between px-5 py-3 border-b border-stone-200 bg-stone-50 shrink-0 shadow-sm z-10">
                                 <h3 className="font-bold font-serif flex items-center gap-2 text-stone-800">
                                     <List size={16} className="text-amber-700" />
-                                    生成结果
+                                    生成记录 & 组合备注
                                 </h3>
-                                {results && (
+                                {history.length > 0 && (
                                     <button
-                                        onClick={() => setResults(null)}
+                                        onClick={clearHistory}
                                         className="text-xs text-stone-400 hover:text-stone-600 transition-colors font-bold"
                                     >
-                                        清空
+                                        清空全部
                                     </button>
                                 )}
                             </div>
 
                             {/* 结果内容（可滚动） */}
-                            <div className="flex-grow overflow-y-auto p-4">
-                                {results ? (
-                                    <div className="grid grid-cols-1 xl:grid-cols-2 gap-3">
-                                        {results.map((res, rIdx) => (
-                                            <div key={rIdx} className="border border-stone-200 rounded overflow-hidden shadow-sm bg-white flex flex-col">
-                                                <div className="bg-stone-100 px-3 py-2 font-bold font-serif text-stone-700 text-xs border-b border-stone-200">
-                                                    {res.tableName}
+                            <div className="flex-grow overflow-y-auto p-4 space-y-4">
+                                {history.length > 0 ? (
+                                    history.map((entry) => (
+                                        <div key={entry.id} className="border border-stone-200 rounded overflow-hidden shadow-sm bg-white flex flex-col pt-2 pb-0">
+                                            {/* 操作栏 */}
+                                            <div className="px-3 flex justify-between items-center mb-2">
+                                                <span className="text-xs text-stone-400 font-mono">{new Date(entry.timestamp).toLocaleTimeString()}</span>
+                                                <div className="flex gap-2.5">
+                                                    <button onClick={() => exportAsImage(`export-${entry.id}`, `记录卡片-${entry.id.slice(0, 6)}`)} className="text-stone-400 hover:text-sky-600 transition-colors" title="导出为 PNG 小卡片">
+                                                        <Image size={15} />
+                                                    </button>
+                                                    <button onClick={() => exportAsMd(entry)} className="text-stone-400 hover:text-stone-800 transition-colors" title="导出为 Markdown 文本">
+                                                        <FileText size={15} />
+                                                    </button>
+                                                    <button onClick={() => removeHistoryEntry(entry.id)} className="text-stone-400 hover:text-red-500 transition-colors" title="删除当前记录">
+                                                        <Trash2 size={15} />
+                                                    </button>
                                                 </div>
-                                                <ul className="divide-y divide-stone-100 text-sm flex-grow">
-                                                    {res.rolled.map((item, iIdx) => (
-                                                        <li key={iIdx} className="px-3 py-2 hover:bg-amber-50 flex items-start gap-2 transition-colors">
-                                                            <span className="text-stone-300 font-mono text-[10px] font-bold w-4 shrink-0 pt-0.5">{iIdx + 1}.</span>
-                                                            <span className="text-stone-800 font-serif leading-snug">{item}</span>
-                                                        </li>
-                                                    ))}
-                                                </ul>
                                             </div>
-                                        ))}
-                                    </div>
+
+                                            {/* 可导出部分 */}
+                                            <div id={`export-${entry.id}`} className="bg-white px-3 pb-3 flex flex-col gap-3">
+                                                <div className="grid grid-cols-1 xl:grid-cols-2 gap-3">
+                                                    {entry.results.map((res, rIdx) => (
+                                                        <div key={rIdx} className="border border-stone-200 rounded overflow-hidden shadow-sm bg-white flex flex-col">
+                                                            <div className="bg-stone-50 px-3 py-1.5 font-bold font-serif text-stone-700 text-xs border-b border-stone-200">
+                                                                {res.tableName}
+                                                            </div>
+                                                            <ul className="divide-y divide-stone-100 text-sm flex-grow">
+                                                                {res.rolled.map((item, iIdx) => (
+                                                                    <li key={iIdx} className="px-3 py-1.5 flex items-start gap-2">
+                                                                        <span className="text-stone-300 font-mono text-[10px] font-bold w-4 shrink-0 pt-0.5">{iIdx + 1}.</span>
+                                                                        <span className="text-stone-800 font-serif leading-snug">{item}</span>
+                                                                    </li>
+                                                                ))}
+                                                            </ul>
+                                                        </div>
+                                                    ))}
+                                                </div>
+
+                                                {/* 备注区 */}
+                                                <div className="flex flex-col gap-1 mt-1 border border-amber-200 bg-amber-50 rounded p-3">
+                                                    <label className="text-xs font-bold text-amber-900 font-serif flex items-center gap-1 mb-1">
+                                                        📝 组合备注与灵感
+                                                    </label>
+                                                    <textarea
+                                                        value={entry.memo}
+                                                        onChange={e => updateMemo(entry.id, e.target.value)}
+                                                        placeholder="给以上随机生成的结果添加联系，组合成完整的设定..."
+                                                        className="w-full bg-transparent border-0 text-sm text-stone-800 placeholder-stone-400 focus:outline-none resize-y min-h-[60px] p-0 font-serif leading-relaxed"
+                                                        rows={Math.max(2, entry.memo.split('\n').length)}
+                                                    />
+                                                </div>
+                                            </div>
+                                        </div>
+                                    ))
                                 ) : (
                                     /* 空状态 */
                                     <div className="h-full flex flex-col items-center justify-center text-stone-300 gap-3 select-none">
